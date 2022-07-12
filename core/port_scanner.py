@@ -5,7 +5,8 @@ import config
 from core.utils   import Utils
 from core.triage  import Triage
 from core.logging import logger
-from db import db_ports
+from db           import db_ports
+from core.redis   import rds
 
 class Fingerprint():
   def __init__(self):
@@ -36,20 +37,28 @@ class Scanner():
     else:
       ports = '--top-ports 100'
 
+    if max_ports == -1:
+      ports = '-p-'
 
     if interface:
       extra_args += '-e {}'.format(interface)
     
     if self.utils.is_user_root():
       scan_cmdline = 'priv_scan'
-    
+   
     result = {}
     
     try:
+      logger.info('Executing scan with {} {} {}'.format(self.nmap_args[scan_cmdline], ports, extra_args))
       result = self.nmap.scan(hosts, arguments='{} {} {}'.format(self.nmap_args[scan_cmdline], ports, extra_args))
+      logger.info("Post scan execution..")
     except nmap.nmap.PortScannerError as e:
       logger.error('Error with scan. {}'.format(e))
-    
+      rds.save_error('PORT SCANNER', 'scan', 'Nmap error with scan. {}'.format(egen))
+    except Exception as egen:
+      logger.error('Generic error with scan. {}'.format(egen))
+      rds.save_error('PORT SCANNER', 'scan', 'Generic error with scan. {}'.format(egen))
+   
     if 'scan' in result:  
       for host, res in result['scan'].items():
         
@@ -70,7 +79,6 @@ class Scanner():
               data[host]['os'] = match['name']
               break
                  
-        
         if 'tcp' in res:
           data[host]['port_data'] = {}
           data[host]['ports'] = set()

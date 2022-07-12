@@ -8,6 +8,9 @@ if [ "$EUID" -ne 0 ]; then
   exit 1
 fi
 
+mkdir /opt/nerve
+mkdir /opt/profiles-inspec
+
 if [ "$cwd" != "/opt/nerve" ]; then
   echo "please run this script from within /opt/nerve folder."
   exit 1
@@ -22,15 +25,10 @@ supported=no
 if [ -f "/etc/redhat-release" ]; then
   os="redhat"
   supported=yes
-elif [ -f "/etc/os-release" ]; then
-  if grep -qi Ubuntu "/etc/os-release"; then
-    os="ubuntu"
-    supported=yes
-  fi
 fi
 
 if [ "$supported" == "no" ]; then 
-  echo "Can only run on CentOS 7.x or Ubuntu 18.x"
+  echo "Can only run on CentOS 7.x"
   exit 1
 fi
 
@@ -49,21 +47,25 @@ function install_redhat {
   yum install -y python3-pip && \
   yum install -y python3-devel && \
   yum install -y wget && \
-  yum clean all
-  wget https://nmap.org/dist/nmap-7.90-1.x86_64.rpm
-  rpm -U nmap-*.rpm
-  rm -rf nmap-*.rpm
-}
-
-function install_ubuntu {
-  apt update -y && \
-  apt install -y gcc && \
-  apt install -y redis && \
-  apt install -y python3 && \
-  apt install -y python3-pip && \
-  apt install -y python3-dev && \
-  apt install -y wget && \
-  apt install -y nmap
+  yum install -y bzip2 && \
+  yum install -y make && \
+  yum install -y gcc-c++ && \
+  yum install -y postgresql-devel && \
+  yum install -y libffi-devel && \
+  yum install -y openssl-devel && \
+  yum install -y libjpeg-turbo-devel && \
+  yum install -y curl && \
+  yum install -y unzip && \
+  yum install -y jq && \
+  yum install -y openssh-clients && \
+  yum install -y net-tools && \
+  yum install -y iproute && \
+  yum install -y git && \
+  yum clean all && \
+  wget https://nmap.org/dist/nmap-7.92.tar.bz2 && \
+  bzip2 -cd nmap-7.92.tar.bz2 | tar xvf - && \
+  cd nmap-7.92 && ./configure && make && make install && \
+  curl https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
 }
 
 function configure_firewalld {
@@ -122,14 +124,7 @@ WantedBy=multi-user.target
   chmod 644 "$systemd_service"
 fi
 
-if [ "$os" == "ubuntu" ]; then 
-  echo "Installing packages..."
-  install_ubuntu
-  echo "Starting Redis..."
-  systemctl enable redis-server
-  systemctl start redis-server
-
-elif [ "$os" == "redhat" ]; then
+if [ "$os" == "redhat" ]; then
   echo "Installing packages..."
   install_redhat
   echo "Starting Redis..."

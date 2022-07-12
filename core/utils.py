@@ -9,11 +9,12 @@ import validators
 import psutil
 import hashlib
 import ipaddress
+import traceback
 
 from core.logging import logger
-from config import WEB_LOG, USER_AGENT
+from config       import WEB_LOG, USER_AGENT
 from urllib.parse import urlparse
-from version import VERSION
+from version      import VERSION
 
 class Utils:
   def generate_uuid(self):
@@ -189,9 +190,46 @@ class Charts:
     ports = {}
     if data:
       for k, v in data.items():
-        if v['port'] not in ports:
-          ports[v['port']] = 1
-        else:
-          ports[v['port']] += 1
+        if 'port' in v: 
+          if v['port'] not in ports:
+            ports[v['port']] = 1
+          else:
+            ports[v['port']] += 1
           
     return ports
+
+def check_service_http(host, port, path, matrix_keys_values):
+  url = "http://{}:{}/{}".format(host, port, path)
+  logger.info("Launching GET request to {}".format(url))
+  return_color = 'red' 
+  try:
+    r = requests.get(url)
+    logger.info("Call ended with status {}".format(r.status_code))
+    if r.status_code == 200:
+      ritorno = r.json()
+
+      logger.info("{}:{} - ritorno: {}".format(host, str(port), ritorno))
+
+      try:
+
+        if 'yellow' in matrix_keys_values:
+          logger.info("{}:{} - Yellow found: {}, return {}".format(host, str(port), matrix_keys_values['yellow'], str(eval(matrix_keys_values['yellow']))))
+          if eval(matrix_keys_values['yellow']):
+            return_color = 'yellow'
+
+        if 'green' in matrix_keys_values:
+          logger.info("{}:{} - Green found: {}, return {}".format(host, str(port), matrix_keys_values['green'], str(eval(matrix_keys_values['green']))))
+          if eval(matrix_keys_values['green']):
+            return_color = 'green'
+
+      except Exception as e:
+        log_exception("Exception: ".format(str(e)))
+    else:
+      logger.error("HTTP status: ".format(str(r.status_code)))
+  except Exception as e_main:
+    log_exception("Exception: ".format(str(e_main)))
+  return return_color
+
+def log_exception(message):
+  logger.error("EXCEPTION: {}".format(message))
+  logger.error("STACKTRACE: {}".format(str(traceback.format_exc())))

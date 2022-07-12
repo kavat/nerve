@@ -37,7 +37,7 @@
           flex-flow:row nowrap;
           margin-top:20px;
       }
-      #summary{ 
+      #summary{
           width:100%;
       }
       #overview {
@@ -45,7 +45,7 @@
           border-top-left-radius: 2em;
           border-bottom-right-radius: 2em;
           overflow: hidden;
-      
+
       }
       #overview th {
           background-color:#13869A;
@@ -60,7 +60,7 @@
       #overview td:hover{
           background-color:white;
       }
-      
+
       #summary {
           border-top-left-radius: 2em;
           border-bottom-right-radius: 2em;
@@ -127,7 +127,7 @@
           font-family:monospace;
           font-size:15px;
       }
-      
+
 
       #details td:hover{
           background-color:white;
@@ -138,7 +138,7 @@
           font-size:12px;
           color:white;
       }
-      
+
   </style>
 </head>
 
@@ -153,29 +153,21 @@
       <table id="overview">
           <tr>
               <th>TIMESTAMP</th>
-              <td colspan="5">{{json_data.conf.metadata.timestamp}}</td>
+              <td colspan="5">{{json_data.head.timestamp}}</td>
           </tr>
           <tr>
             <th>ID</th>
-            <td colspan="5">{{json_data.conf.metadata.unique_id|upper}}</td>
-        </tr>
-          <tr>
-            <th>NAME</th>
-            <td colspan="5">{{json_data.conf.config.name}}</td>
-        </tr>
-          <tr>
-              <th>ENGINEER</th>
-              <td colspan="5">{{json_data.conf.config.engineer}}</td>
+            <td colspan="5">{{json_data.head.unique_id|upper}}</td>
           </tr>
           <tr>
             <th>SOURCE IP</th>
-            <td colspan="5">{{json_data.conf.metadata.issuer.source_ip}}</td>
+            <td colspan="5">{{json_data.head.source_ip}}</td>
         </tr>
       </table>
   </div>
 
   <div style='width:50%;'>
-  
+
 
   <table id='summary'>
       <tr>

@@ -1,4 +1,4 @@
-FROM centos:7
+FROM --platform=linux/arm64/v8 centos:7
 
 ARG TARGET_FOLDER=/opt/nerve
 
@@ -10,13 +10,30 @@ RUN yum install epel-release -y && \
     yum install -y python3-pip && \
     yum install -y python3-devel && \
     yum install -y wget && \
+    yum install -y bzip2 && \
+    yum install -y make && \
+    yum install -y gcc-c++ && \
+    yum install -y postgresql-devel && \
+    yum install -y libffi-devel && \
+    yum install -y openssl-devel && \
+    yum install -y libjpeg-turbo-devel && \
+    yum install -y curl && \
+    yum install -y unzip && \
+    yum install -y jq && \
+    yum install -y openssh-clients && \
+    yum install -y net-tools && \
+    yum install -y iproute && \
+    yum install -y git && \
     yum clean all
 
+RUN wget https://nmap.org/dist/nmap-7.92.tar.bz2 && \
+    bzip2 -cd nmap-7.92.tar.bz2 | tar xvf - && \
+    cd nmap-7.92 && ./configure && make && make install
 
-RUN wget https://nmap.org/dist/nmap-7.90-1.x86_64.rpm
-RUN rpm -ivh nmap-*.x86_64.rpm
+RUN curl https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
 
 RUN mkdir /opt/nerve
+RUN mkdir /opt/profiles-inspec
 
 ADD bin $TARGET_FOLDER/bin
 ADD core $TARGET_FOLDER/core
@@ -35,6 +52,7 @@ COPY main.py $TARGET_FOLDER
 COPY requirements.txt $TARGET_FOLDER
 COPY start.sh $TARGET_FOLDER
 COPY version.py $TARGET_FOLDER
+
 WORKDIR $TARGET_FOLDER/
 
 RUN pip3 install --user -r requirements.txt

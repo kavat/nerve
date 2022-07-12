@@ -72,11 +72,13 @@ def scheduler():
       
       while True:
         if rds.is_session_active():
+          logger.info("Session active..")
           checks = 0
         else:
           checks += 1 
+          logger.info("Session inactive n " + str(checks))
         
-        if checks == 10:
+        if checks == rds.get_custom_config('config_session_max_checks') or rds.get_force_end_session():
           logger.info('Session is about to end...')
           webhook = conf.get_cfg_webhook()
           email_settings = rds.get_email_settings()
@@ -101,7 +103,7 @@ def scheduler():
           rds.end_session()  
           break  
         
-        time.sleep(20)
+        time.sleep(rds.get_custom_config('config_session_time_sleep_check'))
     
     elif frequency == 'continuous':
       rds.start_session()
@@ -116,11 +118,13 @@ def scheduler():
       
       while True:
         if rds.is_session_active():
+          logger.info("Session active..")
           checks = 0
         else:
           checks += 1 
+          logger.info("Session inactive n " + str(checks))
         
-        if checks == 10:
+        if checks == rds.get_custom_config('config_session_max_checks') or rds.get_force_end_session():
           logger.info('Session is about to end...')
           webhook = conf.get_cfg_webhook()
           vuln_data = rds.get_vuln_data()
@@ -134,4 +138,4 @@ def scheduler():
           rds.create_session()
           break
           
-        time.sleep(20)
+        time.sleep(rds.get_custom_config('config_session_time_sleep_check'))

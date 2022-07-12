@@ -5,22 +5,23 @@ from flask import (
   Blueprint,
   render_template,
   flash,
-  redirect
+  redirect,
+  request
 )
 
 alert = Blueprint('alert', __name__,
                       template_folder='templates')
 
-@alert.route('/alert/view/<alert_id>')
+@alert.route('/alert/view/<alert_id>/<scan_type>')
 @session_required
-def view_alert(alert_id):
+def view_alert(alert_id, scan_type):
   vuln = rds.get_vuln_by_id(alert_id)
   if not vuln:
     flash('Could not display alert.',  'error')
     return redirect('/vulnerabilities')
-  
-  return render_template('alert.html', vuln={'key':alert_id,'data':vuln})
-  
+
+  return render_template('alert.html', vuln={'key':alert_id,'data':vuln},scan_type=scan_type)
+
 
 @alert.route('/alert/resolve/<alert_id>')
 @session_required
@@ -28,7 +29,7 @@ def view_resolve_alert(alert_id):
   if not rds.get_vuln_by_id(alert_id):
     flash('Could not resolve alert.',  'error')
     return redirect('/vulnerabilities')
-  
+
   rds.delete(alert_id)
   flash('Resolved alert successfully.',  'success')
   return redirect('/vulnerabilities')

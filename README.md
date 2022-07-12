@@ -1,13 +1,16 @@
 # Network Exploitation, Reconnaissance & Vulnerability Engine (N.E.R.V.E)
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/2.png?raw=true)
+![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/dashboard.png)
 
 # Table of Contents
 * [Continuous Security](#Continuous-Security)
 * [About NERVE](#)
   * [What is NERVE](#about-Nerve)
+  * [How it works](#how-it-works)
+  * [Differences among version 2 and current version on this project](#Differences-among-version-2-and-current-version-on-this-project)
   * [Features](#features)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
+  * [Configuration file config.py](#Configuration-file-config.py)
   * [Deployment Recommendations](#Deployment-Recommendation)
   * [Installation - Docker](#docker)
   * [Installation - Bare Metal](#server)
@@ -16,21 +19,20 @@
 * [Security](#security)
 * [Usage](#usage)
 * [License](#license)
-* [Mentions](#mentions)
 * [Screenshots](#screenshots)
 
 
 # Continuous Security
-We believe security scanning should be done continuously. Not daily, weekly, monthly, or quarterly.
+As [Paytm](https://github.com/paytm/nerve) said when initial branch of NERVE has been released, security scanning should be done continuously. Not daily, weekly, monthly, or quarterly.
 
-The benefit of running security scanning contiuously can be any of the following:
+The benefit of running security scanning continuously can be any of the following:
 * You have a dynamic environment where infrastructure gets created every minute / hour / etc.
 * You want to be the first to catch issues before anyone else
 * You want the ability to respond quicker.
 
-NERVE was created to address this problem. Commercial tools are great, but they are also heavy, not easily extensible, and cost money. 
+NERVE was created to address this problem. Commercial tools are great, but they are also heavy, not easily extensible, and cost money.
 
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/12.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/12.png?raw=true)
 
 # About NERVE
 NERVE is a vulnerability scanner tailored to find low-hanging fruit level vulnerabilities, in specific application configurations, network services, and unpatched services.
@@ -47,22 +49,64 @@ Example of some of NERVE's detection capabilities:
 * Open Caches
 * Directory Indexing
 * Best Practices
+* NMAP execution by SSH VPN tunnel (this permits internal scan in order to detect services binded on localhost, it's important to indentify services if an attacker would want stealth persistency)
+* CVE list based on packages installed list on the system (using cve-search framework forked [on my repo](https://github.com/kavat/cve-search))  
+* Profile scan using DevSec framework to verify OS hardening (using my [compliance-profile](https://github.com/kavat/compliance-profile) project)
 
-It is not a replacement for Qualys, Nessus, or OpenVAS. It does not do authenticated scans, and operates in black-box mode only.
+# How it works
+NERVE permits to conduce vulnerability assessment based on NMAP run, launching scanning TCP/UDP oriented and reaching informations services related
+
+# Differences among version 2 and current version on this project
+Different from previous project, NERVE can do authenticated scans operating not in black-box mode only from version 3.
+
+Based on NMAP library even, this feature checks and tests open doors and analysis services related: normal scans do it from outside, internal scans do it from inside, it's very importante when we want to check internal perimeter in order to detect all points where an attacker could do stealth persistency.
+
+To go inside of host, Flask interface creates a SSH VPN tunnel among itself and destination host (automatically or manually as indicated by UI interface).
+
+CVE search has been implemented and joined with NERVE starting from the packages installed list. CVE-Search has been forked [on my repo](https://github.com/kavat/cve-search) and this version allows to perform API call with program name and version as only parameters. This provides a full list of CVE related to the packages installed on the system.
+
+Using inspec framework and profiles official released by DevSec as:
+* [Linux Baseline](https://github.com/dev-sec/linux-baseline)
+* [CIS Linux](https://github.com/dev-sec/cis-dil-benchmark)
+* [Windows Baseline](https://github.com/dev-sec/windows-baseline)
+new project [compliance-profile](https://github.com/kavat/compliance-profile) on my repository was born. This feature allows to perform a scan to verify OS hardening suggested by DevSec profiles.
+
+Reports for every type of scan is provided.
+
+## Manually SSH VPN tunnel creation
+Manual creation has as requirement that preliminary operations on destination host has to be done by user.
+
+User has to login to destination host and run the following command
+
+```
+sed "s/^[#]\{0,1\}PermitTunnel\(.*\)/PermitTunnel point-to-point/g" /etc/ssh/sshd_config -i
+systemctl restart sshd
+ip tuntap add tun0 mode tun
+ip addr add X.X:X.X/30 dev tun0 # X.X.X.X is the value set in config.DEFAULT_SCAN['ip_peer_static'] in config.py
+ip link set dev tun0 up
+sysctl net.ipv4.ip_forward=1
+sysctl net.ipv4.conf.all.route_localnet=1
+iptables -t nat -I PREROUTING -i tun0 -j DNAT --to 127.0.0.1
+```
+
+After, interface will launches SSH VPN tunnel by itself (on destination host specified with SSH username and password) and it will starts assessment operations
+
+# Limitations
+
+Internal scan, CVE search and Compliance profile in this moment don't support Windows (in roadmap windows compatibility)
+
+Internal scan, CVE search and Compliance profile in this moment support one host for time scan (in roadmap CIDR extension)
 
 # Features
 NERVE offers the following features:
 * Dashboard (With a Login interface)
+* Check external services status (CVE and Compliance Profile services)
 * REST API (Scheduling assessments, Obtaining results, etc)
 * Notifications
   * Slack
   * Email
   * Webhook
-* Reports
-  * TXT
-  * CSV
-  * HTML
-  * XML
+* Reports HTML for every type of scan
 * Customizable scans
   * Configurable intrusiveness levels
   * Scan depth
@@ -71,11 +115,11 @@ NERVE offers the following features:
   * Thread Control
   * Custom Ports
 * Network Topology Graphs
-
-We put together the Graphical User Interface primarily for ease of use, but we will be putting more emphasis on detections and new signatures than creating a full blown user interface. 
+* CVE related to packages installed list
+* Compliance profile execution with OS hardening best practice
 
 # Prerequisites
-NERVE will install all the prerequisites for you automatically if you choose the Server installation (CentOS 7.x and Ubuntu 18.x were tested) (by using `install/setup.sh` script). It also comes with a Dockerfile for your convenience. 
+NERVE will install all the prerequisites for you automatically if you choose the Server installation (CentOS 7.x and Ubuntu 18.x were tested) (by using `install/setup.sh` script). It also comes with a Dockerfile for your convenience.
 
 Keep in mind, NERVE requires root access for the initial setup on bare metal (package installation, etc).
 
@@ -83,11 +127,26 @@ Services and Packages required for NERVE to run:
 * Web Server (Flask)
 * Redis server (binds locally)
 * Nmap package (binary and Python nmap library)
-* Inbound access on HTTP/S port (you can define this in config.py) 
+* Inbound access on HTTP/S port (you can define this in config.py)
 
 The installation script takes care of everything for you, but if you want to install it by yourself, keep in mind these are required.
 
+For this version is strongly recommended Docker container installation.
+
 # Installation
+
+## Configuration file config.py
+In config.py file user has to indicate new services configuration parameters, in details:
+
+```
+CVE_SCAN_SERVICE_HOST = "172.17.0.2"
+CVE_SCAN_SERVICE_PORT = 5000
+PROFILE_SERVICE_HOST = "172.17.0.3"
+PROFILE_SERVICE_PORT = 5000
+```
+
+The first two lines indicate configuration for cve-search service, second two lines indicate configuration for compliance-profile service: both services has to be reachable from NERVE running host
+
 ## Deployment Recommendation
 The best way to deploy it, is to run it against your infrastructure from multiple regions (e.g. multiple instances of NERVE, in multiple countries), and toggle continuous mode so that you can catch short-lived vulnerabilities in dynamic environments/cloud.
 
@@ -106,22 +165,22 @@ Here are the high level steps we recommend to get the most optimal results:
 
 ## Docker
 ### Clone the repository
-`git clone git@github.com:PaytmLabs/nerve.git && cd nerve`
+`git clone git@github.com:kavat/nerve.git && cd nerve`
 
 ### Build the Docker image
 `docker build -t nerve .`
 
 ### Create a container from the image
-`docker run -e username="YOUR_USER" -e password="YOUR_PASSWORD" -d -p 80:8080 nerve`
+`docker run -e username="YOUR_USER" -e password="YOUR_PASSWORD" -d --privileged -p 8080:8080 nerve`
 
-In your browser, navigate to http://ip.add.re.ss:80 and login with the credentials you specified to in the previous command.
+In your browser, navigate to http://ip.add.re.ss:8080 and login with the credentials you specified to in the previous command.
 
 # Server
 ### Navigate to /opt
 `cd /opt/`
 
 ### Clone the repository
-`git clone git@github.com:PaytmLabs/nerve.git && cd nerve`
+`git clone git@github.com:kavat/nerve.git && cd nerve`
 
 ### Run Installer (requires root)
 `bash install/setup.sh`
@@ -171,38 +230,34 @@ To learn about NERVE (GUI, API, etc.) we advise you to check out the documentati
 Once you deploy it, authenticate and on the left sidebar you will find a documentation link for API and GUI usage.
 
 ## GUI Documentation
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/10.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/10.png?raw=true)
 
 ## API Documentation
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/11.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/11.png?raw=true)
 
 # License
 It is distributed under the MIT License. See LICENSE for more information.
 
-# Mentions
-:trophy: NERVE has been mentioned in various places so far, here are a few links.
-* Kitploit - https://www.kitploit.com/2020/09/nerve-network-exploitation.html
-* Hakin9 - https://hakin9.org/nerve-network-exploitation-reconnaissance-vulnerability-engine/
-* PentestTools - https://pentesttools.net/nerve-network-exploitation-reconnaissance-vulnerability-engine/
-* SecnHack.in - https://secnhack.in/nerve-exploitation-reconnaissance-vulnerability-engine/
-* 100security.com - https://www.100security.com.br/nerve
-
 # Screenshots
 ## Login Screen
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/1.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/1.png?raw=true)
 ## Dashboard Screen
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/2.png?raw=true)
+![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/dashboard.png)
 ## Assessment Configuration
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/3.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/3.png?raw=true)
 ## API Documentation
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/4.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/4.png?raw=true)
 ## Reporting
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/5.png?raw=true)
+![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/reporting.png)
 ## Network Map
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/6.png?raw=true)
-## Vulnerability page
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/7.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/6.png?raw=true)
+## Vulnerabilities Network page
+![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/vulnerabilities_network.png)
+## Vulnerabilities CVE page
+![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/vulnerabilities_cve.png)
+## Vulnerabilities Inspec page
+![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/vulnerabilities_inspec.png)
 ## Log Console
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/8.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/8.png?raw=true)
 ## HTML Report
-![Nerve](https://github.com/PaytmLabs/nerve/blob/master/static/screenshots/9.png?raw=true)
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/9.png?raw=true)

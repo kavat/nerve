@@ -24,42 +24,11 @@
                 <button type="button" id="sidebarCollapse" class="btn btn-outline-light default-light-menu"><i class="fas fa-bars"></i><span></span></button>
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="nav navbar-nav ml-auto">
-                        <li class="nav-item dropdown">
-                              
-                            <div class="nav-dropdown">
-                                <a href="" class="nav-item nav-link dropdown-toggle" data-toggle="dropdown"><i class="fas fa-user-shield"></i> <i style="font-size: .8em;" class="fas fa-caret-down"></i></a>
-                                <div class="dropdown-menu dropdown-menu-right nav-link-menu">   
-                                    <ul class="nav-list">
-                                      <li><a href="https://github.com/PaytmLabs/nerve/issues" class="dropdown-item"><i class="fas fa-bug"></i> Report a Bug</a></li>
-                                      <li><a href="/settings" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a></li>
-                                      <div class="dropdown-divider"></div>
-                                      <li><a href="/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <div class="nav-dropdown">
-                                {% if vuln_count %}
-                                <span class="nav-item nav-link"> <i class="fas fa-bell"></i><span class="badge badge-danger">{{vuln_count}}</span>
-                                {% else %}
-                                <span class="nav-item nav-link"> <i class="fa fa-bell"></i><span class="badge badge-success">{{vuln_count}}</span> 
-                                {% endif %}
-                            </div>
-                        </li>  
-                        <li class="nav-item dropdown">
-                          <div class="nav-dropdown">
-                            {% if status == "Ready" %}
-                            <span class="nav-item nav-link"> <span class="navbar-status c-green"><i class="fas fa-smile"></i> {{status}}</span> </span>
-                            {% else %}
-                            <span class="nav-item nav-link"> <span class="navbar-status c-white"> <i class="fa fa-spinner fa-spin"></i> {{status}}</span> </span> 
-                            {% endif %}
-                          </div>
-                      </li>  
+                          {% include 'headbar.html' %}
                     </ul>
                 </div>
             </nav>
-            
+
             <div class="content">
               <div class="container-fluid">
                   <div class="page-title">
@@ -68,11 +37,27 @@
                   <div class="row">
                       <div class="col-md-12 col-lg-12">
                           <div class="card">
-                              <div class="card-header">Vulnerabilities</div>
+                              <div class="card-header">Scan type</div>
+                              <div class="card-body">
+                                <a href="/vulnerabilities?scan_type=network">Network</a>
+                                <br>
+                                <a href="/vulnerabilities?scan_type=cve">CVE</a>
+                                <br>
+                                <a href="/vulnerabilities?scan_type=inspec">Inspec</a>
+                                <br>
+                                <a href="/system_mgmnt?operation=backup" target='_blank'>Backup data</a>
+                              </div>
+                          </div>
+                      </div>
+                      {% if scan_type != None  %}
+                      <div class="col-md-12 col-lg-12">
+                          <div class="card">
+                              <div class="card-header">Vulnerabilities type: {{scan_type}} (<a href='/vulnerabilities/clear?scan_type={{scan_type}}'>clear existing data</a>)</div>
                               <div class="card-body">
                                   <p class="card-title"></p>
                                   <table class="table table-hover" id="dataTables-vulnerabilities" width="100%">
                                       <thead>
+                                          {% if scan_type == 'network' %}
                                           <tr>
                                               <th>#</th>
                                               <th>Target</th>
@@ -82,16 +67,38 @@
                                               <th>Result</th>
                                               <th>Actions</th>
                                           </tr>
+                                          {% endif %}
+                                          {% if scan_type == 'cve' %}
+                                          <tr>
+                                              <th>#</th>
+                                              <th>Target</th>
+                                              <th>CVE</th>
+                                              <th>Package</th>
+                                              <th>Severity</th>
+                                              <th>Actions</th>
+                                          </tr>
+                                          {% endif %}
+                                          {% if scan_type == 'inspec' %}
+                                          <tr>
+                                              <th>#</th>
+                                              <th>Target</th>
+                                              <th>Control</th>
+                                              <th>Test</th>
+                                              <th>Result</th>
+                                              <!-- <th>Actions</th> -->
+                                          </tr>
+                                          {% endif %}
                                       </thead>
                                       {% if data %}
                                       {% for key, value in data.items() %}
+                                      {% if scan_type == 'network' %}
                                       <tr>
                                          <td>{{loop.index}}.</td>
                                          <td>{{value.ip}}</td>
                                          <td>{% if value.domain %} {{value.domain}} {% else %} N/A {% endif %}</td>
                                          <td>{{value.port}}</td>
                                          {% if value.rule_sev == 0 %}
-                                         <td><span class="informational">Informational</td> 
+                                         <td><span class="informational">Informational</td>
                                         {% elif value.rule_sev == 1 %}
                                         <td><span class="low">Low</td>
                                         {% elif value.rule_sev == 2 %}
@@ -103,7 +110,7 @@
                                         {% endif %}
                                          <td>{{value.rule_confirm}}</td>
                                          <td>
-                                            <a href="/alert/view/{{key}}">
+                                            <a href="/alert/view/{{key}}/{{scan_type}}">
                                             <button type="button" class="btn btn-outline-info mb-2">View</button>
                                             </a>
                                             <a href="/alert/resolve/{{key}}">
@@ -111,13 +118,59 @@
                                             </a>
                                         </td>
                                        </tr>
+                                       {% endif %}
+                                       {% if scan_type == 'cve' %}
+                                       <tr>
+                                         <td>{{loop.index}}.</td>
+                                         <td>{{value.ip}}</td>
+                                         <td>{{value.cve_id}}</td>
+                                         <td>{{value.cpe}}</td>
+                                         {% if value.rule_sev == 0 %}
+                                         <td><span class="informational">Informational</td>
+                                        {% elif value.rule_sev == 1 %}
+                                        <td><span class="low">Low</td>
+                                        {% elif value.rule_sev == 2 %}
+                                        <td><span class="medium">Medium</td>
+                                        {% elif value.rule_sev == 3 %}
+                                        <td><span class="high">High</span></td>
+                                        {% elif value.rule_sev == 4 %}
+                                        <td><span class="critical">Critical</td>
+                                        {% endif %}
+                                         <td>
+                                            <a href="/alert/view/{{key}}/{{scan_type}}">
+                                            <button type="button" class="btn btn-outline-info mb-2">View</button>
+                                            </a>
+                                            <a href="/alert/resolve/{{key}}">
+                                                <button type="button" class="btn btn-outline-success mb-2">Resolve</button>
+                                            </a>
+                                        </td>
+                                       </tr>
+                                       {% endif %}
+                                       {% if scan_type == 'inspec' %}
+                                       <tr>
+                                         <td>{{loop.index}}.</td>
+                                         <td>{{value.ip}}</td>
+                                         <td>{{value.control_title}}</td>
+                                         <td>{{value.result_desc}}</td>
+                                         <td>{{value.result_status}}</td>
+                                         <!-- <td>
+                                            <a href="/alert/view/{{key}}">
+                                            <button type="button" class="btn btn-outline-info mb-2">View</button>
+                                            </a>
+                                            <a href="/alert/resolve/{{key}}">
+                                                <button type="button" class="btn btn-outline-success mb-2">Resolve</button>
+                                            </a>
+                                        </td> -->
+                                       </tr>
+                                       {% endif %}
                                        {% endfor %}
                                        {% endif %}
-                          
+
                                   </table>
                               </div>
                           </div>
                       </div>
+                      {% endif %}
                   </div>
 
               </div>

@@ -6,3 +6,5 @@ reports/
 **/reports/*.html
 **/logs/nerve.log
 tests/
+logs/
+redis-snapshot

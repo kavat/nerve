@@ -14,9 +14,13 @@ def view_dashboard():
   networks = []
   domains  = []
   
-  hosts = rds.get_topology()
-  cfg   = rds.get_scan_config()
-  vulns = rds.get_vuln_data()
+  hosts       = rds.get_topology()
+  cfg         = rds.get_scan_config()
+  vulns_radar = rds.get_vuln_data()
+  vulns       = rds.get_vuln_data()
+  cves        = rds.get_cve_data()
+
+  vulns.update(cves)
   
   if cfg:
     networks = cfg['targets']['networks']

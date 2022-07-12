@@ -3,6 +3,8 @@ import sys
 import redis
 import threading
 import pickle
+import json
+import base64
 
 from core.logging import logger
 from core.utils   import Utils
@@ -34,7 +36,53 @@ class RedisManager:
   
   def store_topology(self, host):
     self.r.sadd("sess_topology", host)
-  
+
+  def save_error(self, macro_name, func_name, message):
+    try:
+      date_time = self.utils.get_datetime()
+      key = "error_{}_{}_{}".format(macro_name, func_name, date_time)
+      json_object = {
+        "datetime": date_time,
+        "macro_name": macro_name,
+        "func_name": func_name,
+        "message": message
+      }
+      self.store_json(key, json_object)
+    except Exception as e:
+      logger.error("Exception creating error on Redis: {}".format(str(e)))
+
+  def get_custom_config(self, key):
+    default = ''
+    if key == 'config_cve_scan_service_host':
+      default = config.CVE_SCAN_SERVICE_HOST
+    if key == 'config_cve_scan_service_port':
+      default = config.CVE_SCAN_SERVICE_PORT
+    if key == 'config_cve_scan_use_threads':
+      default = config.CVE_SCAN_USE_THREADS
+    if key == 'config_cve_scan_max_threads':
+      default = config.CVE_SCAN_MAX_THREADS
+    if key == 'config_session_max_checks':
+      default = config.SESSION_MAX_CHECKS
+    if key == 'config_session_time_sleep_check':
+      default = config.SESSION_TIME_SLEEP_CHECK 
+    if key == 'config_profile_service_host':
+      default = config.PROFILE_SERVICE_HOST
+    if key == 'config_profile_service_port':
+      default = config.PROFILE_SERVICE_PORT
+    try:
+      ritorno = self.r.get(key)
+      if ritorno:
+        if key == 'config_session_time_sleep_check' or key == 'config_session_max_checks' or key == 'config_cve_scan_service_port' or key == 'config_cve_scan_use_threads' or key == 'config_profile_service_port':
+          return int(ritorno.decode('utf-8'))
+        else:
+          return ritorno.decode('utf-8')
+      else:
+        logger.error("Unable to return {}, return default {}".format(str(key), str(default)))
+        return default
+    except Exception as e:
+      logger.error("Unable to return {}, return default {}, exception: {}".format(str(key), str(default), str(e)))
+      return default
+ 
   def get_slack_settings(self):
     return self.r.get('p_settings_slack')
   
@@ -44,19 +92,53 @@ class RedisManager:
       settings = pickle.loads(settings)
     
     return settings
-    
+   
+  def store_scan_info(self, type, value):
+    key = 'last_scan_{}'.format(str(type))
+   
+    if self.r.exists(key):
+      self.r.delete(key)
+   
+    self.r.set(key, value) 
+ 
   def store_vuln(self, value):
     key = '{}{}{}{}'.format(value['ip'], value['port'], 
                             value['rule_id'], value['rule_details'])
     key_hash = 'vuln_' + self.utils.hash_sha1(key)
     
     if self.r.exists(key_hash):
-      return False
+      self.r.delete(key_hash)
+      #return False
     
     logger.info('Vulnerability detected')
     
     self.store_json(key_hash, value)
-    
+  
+  def store_cve(self, value):
+    key = '{}{}{}{}'.format(value['ip'], value['cve_id'],
+                            value['cpe'], value['rule_details'])
+    key_hash = 'cve_' + self.utils.hash_sha1(key)
+   
+    if self.r.exists(key_hash):
+      self.r.delete(key_hash)
+      #return False
+   
+    logger.info('CVE detected')
+   
+    self.store_json(key_hash, value)
+ 
+  def store_inspec(self, value):
+    key = '{}{}'.format(value['host'], value['control_id'])
+    key_hash = 'inspec_' + self.utils.hash_sha1(key)
+
+    if self.r.exists(key_hash):
+      self.r.delete(key_hash)
+      #return False
+   
+    logger.info('Inspec control detected')
+   
+    self.store_json(key_hash, value)
+
   def store_sca(self, key, value):
     key = 'sca_' + key
     self.store_json(key, value)
@@ -91,6 +173,11 @@ class RedisManager:
 
     return data
 
+  def get_last_scan_info(self, prefix):
+    key = "last_scan_{}".format(prefix)
+    if self.r.exists(key):
+      return json.loads(base64.b64decode(self.r.get(key)).decode('ascii'))
+
   def get_scan_data(self):
     kv = {}
     ip_key = None
@@ -111,6 +198,49 @@ class RedisManager:
         except pickle.UnpicklingError as e:
           logger.error('Error unpickling %s' % e)
           logger.debug('IP Key: %s' % ip_key)
+
+    return kv
+
+  def del_inspec_data(self):
+    for ip_key in self.r.scan_iter(match="inspec_*"):
+      self.r.delete(ip_key)
+
+  def get_inspec_data(self):
+    kv = {}
+    for ip_key in self.r.scan_iter(match="inspec_*"):
+      data = self.r.get(ip_key)
+      if data:
+        try:
+          result = pickle.loads(data)
+          kv[ip_key.decode('utf-8')] = result
+        except:
+          logger.error('Error retrieving key')
+
+    return kv
+
+  def get_cve_data(self):
+    kv = {}
+    for ip_key in self.r.scan_iter(match="cve_*"):
+      data = self.r.get(ip_key)
+      if data:
+        try:
+          result = pickle.loads(data)
+          kv[ip_key.decode('utf-8')] = result
+        except:
+          logger.error('Error retrieving key')
+
+    return kv
+
+  def get_alarm_data(self):
+    kv = {}
+    for key in self.r.scan_iter(match="error_*"):
+      data = self.r.get(key)
+      if data:
+        try:
+          result = pickle.loads(data)
+          kv[key.decode('utf-8')] = result
+        except:
+          logger.error('Error retrieving key')
 
     return kv
 
@@ -186,7 +316,24 @@ class RedisManager:
     if self.is_scan_active() or self.is_attack_active():
       return True
     return False
-  
+ 
+  def get_force_end_session(self):
+    try:
+      state = self.r.get('sess_force_end')
+      if state != None:
+        if state.decode("utf-8") == 'to_end':
+          logger.info("sess_force_end found, delete and return true")
+          self.r.delete('sess_force_end')
+          return True
+    except Exception as e:
+      logger.error(str(e))
+      logger.exception(e)
+      return False
+    return False
+
+  def set_force_end_session(self):
+    self.store('sess_force_end', 'to_end')
+ 
   def get_session_state(self):
     state = self.r.get('sess_state')
     if state:
@@ -205,9 +352,24 @@ class RedisManager:
   def end_session(self):
     logger.info('The session has ended.')
     self.store('sess_state', 'completed')
-  
-  def clear_session(self):
-    for prefix in ('vuln', 'sca', 'sch', 'inv'):
+
+  def backup_data(self):
+    try:
+      stringa_backup = ""
+      for prefix in ('vuln', 'cve', 'inspec'):
+        for key in self.r.scan_iter(match="{}_*".format(prefix)):
+          contenuto = base64.b64encode(self.r.get(key)).decode('utf-8')
+          stringa_backup = "{}{}__||__{}\n".format(stringa_backup, key.decode('utf-8'), contenuto)
+      f = open("/tmp/backup_redis.txt", "w")
+      f.write(stringa_backup)
+      f.close()
+      return True
+    except Exception as e:
+      logger.error("Exception generating Redis backup file: {}".format(str(e)))
+      return False 
+
+  def clear_session_orig(self):
+    for prefix in ('vuln', 'sca', 'sch', 'inv', 'cve', 'inspec'):
       for key in self.r.scan_iter(match="{}_*".format(prefix)):
         self.r.delete(key)
       
@@ -215,8 +377,21 @@ class RedisManager:
       self.r.delete('sess_{}'.format(i))
     
     self.utils.clear_log()
-  
-  
+
+  def clear_session(self):
+    for i in ('config', 'state'):
+      self.r.delete('sess_{}'.format(i))
+
+  def clear_data_prefix(self, prefix):
+    if prefix == 'network':
+      self.r.delete('last_scan_network')
+      for i in ('vuln', 'sca', 'sch', 'inv'):
+        self.clear_data_prefix(i)
+    if prefix == 'cve' or prefix == 'inspec':
+      self.r.delete("last_scan_{}".format(prefix))
+    for key in self.r.scan_iter(match="{}_*".format(prefix)):
+      self.r.delete(key)
+
   def is_ip_blocked(self, ip):
     key = 'logon_attempt-{}'.format(ip)
     attempts = self.r.get(key)
@@ -238,7 +413,17 @@ class RedisManager:
 
   def db_size(self):
     return self.r.dbsize()
-  
+ 
+  def set_custom_config(self):
+    self.r.set('config_cve_scan_service_host', config.CVE_SCAN_SERVICE_HOST)
+    self.r.set('config_cve_scan_service_port', config.CVE_SCAN_SERVICE_PORT)
+    self.r.set('config_cve_scan_use_threads', config.CVE_SCAN_USE_THREADS)
+    self.r.set('config_cve_scan_max_threads', config.CVE_SCAN_MAX_THREADS)
+    self.r.set('config_session_max_checks', config.SESSION_MAX_CHECKS)
+    self.r.set('config_session_time_sleep_check', config.SESSION_TIME_SLEEP_CHECK)
+    self.r.set('config_profile_service_host', config.PROFILE_SERVICE_HOST)
+    self.r.set('config_profile_service_port', config.PROFILE_SERVICE_PORT)
+ 
   def initialize(self):
     self.clear_session()
     self.r.set('p_scan-count', 0)

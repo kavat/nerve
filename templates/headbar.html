@@ -1,0 +1,66 @@
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+    <a href="" class="nav-item nav-link dropdown-toggle" data-toggle="dropdown">
+      <i class="fas fa-user-shield"></i>
+      <i style="font-size: .8em;" class="fas fa-caret-down"></i>
+    </a>
+    <div class="dropdown-menu dropdown-menu-right nav-link-menu">
+      <ul class="nav-list">
+        <li><a href="https://github.com/kavat/nerve/issues" class="dropdown-item"><i class="fas fa-bug"></i> Report a Bug</a></li>
+        <li><a href="/settings" class="dropdown-item"><i class="fas fa-cog"></i> Settings</a></li>
+        <div class="dropdown-divider"></div>
+        <li><a href="/logout" class="dropdown-item"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+      </ul>
+    </div>
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+  {% if alarm_count %}
+    <span class="nav-item nav-link"> <i class="fas fa-bell"></i><span class="badge badge-danger" onclick="location.href='/errors';">{{alarm_count}}</span>
+  {% else %}
+    <span class="nav-item nav-link"> <i class="fa fa-bell"></i><span class="badge badge-success">{{alarm_count}}</span>
+  {% endif %}
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+  {% if vuln_count %}
+    <span class="nav-item nav-link"> <i class="fas fa-bug"></i><span class="badge badge-danger" onclick="location.href='/vulnerabilities';">{{vuln_count}}</span>
+  {% else %}
+    <span class="nav-item nav-link"> <i class="fa fa-bug"></i><span class="badge badge-success">{{vuln_count}}</span>
+  {% endif %}
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+  {% if status == "Ready" %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-green"><i class="fas fa-smile"></i> Scan {{status}}</span> </span>
+  {% else %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-white"> <i class="fa fa-spinner fa-spin"></i> Scan {{status}}</span> </span>
+  {% endif %}
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+  {% if cve_service_status == 'green' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-green"><i class="fas fa-smile"></i> CVE Ready</span> </span>
+  {% endif %}
+  {% if cve_service_status == 'yellow' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-yellow"> <i class="fa fa-frown"></i> CVE Warning</span> </span>
+  {% endif %}
+  {% if cve_service_status == 'red' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-red"> <i class="fa fa-angry"></i> CVE Failed</span> </span>
+  {% endif %}
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+  {% if profile_service_status == 'green' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-green"><i class="fas fa-smile"></i> Profile Ready</span> </span>
+  {% endif %}
+  {% if profile_service_status == 'red' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-red"> <i class="fa fa-angry"></i> Profile Failed</span> </span>
+  {% endif %}
+  </div>
+</li>

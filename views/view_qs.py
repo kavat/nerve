@@ -29,6 +29,7 @@ def view_qs():
     
     if network:
       scan = copy.deepcopy(config.DEFAULT_SCAN)
+      scan['type'] = 'network'
       scan['targets']['networks'].append(network)
       schema = SchemaParser(scan, request)
       vfd, msg, scan = schema.verify()

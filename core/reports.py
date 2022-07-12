@@ -2,6 +2,7 @@ import csv
 import jinja2
 import xml.etree.ElementTree as xml
 
+from core.logging import logger
 from core.redis import rds
 from core.utils import Utils
 from version import VERSION
@@ -29,7 +30,7 @@ def generate_csv(data):
   
   return filename
 
-def generate_html(vulns, conf):
+def generate_html(vulns, head, conf):
   vuln_count = {0:0, 1:0, 2:0, 3:0, 4:0}
   filename = 'report-{}-{}.html'.format(utils.generate_uuid(), utils.get_date())
   templateLoader = jinja2.FileSystemLoader(searchpath="./templates/")
@@ -43,6 +44,7 @@ def generate_html(vulns, conf):
   sorted_vulns = {k: v for k, v in sorted(vulns.items(), key=lambda item: item[1]['rule_sev'], reverse=True)}
   
   body = {
+        'head': head,
         'conf': conf,
         'vulns': sorted_vulns,
         'vuln_count':vuln_count,
@@ -54,6 +56,62 @@ def generate_html(vulns, conf):
   f.write(html)
   f.close()
   
+  return filename
+
+def generate_html_cve(vulns, head, conf):
+  vuln_count = {0:0, 1:0, 2:0, 3:0, 4:0}
+  filename = 'report-{}-{}.html'.format(utils.generate_uuid(), utils.get_date())
+  templateLoader = jinja2.FileSystemLoader(searchpath="./templates/")
+  templateEnv = jinja2.Environment(loader=templateLoader)
+  TEMPLATE_FILE = "report_template_cve.html"
+  template = templateEnv.get_template(TEMPLATE_FILE)
+
+  for k, v in vulns.items():
+    vuln_count[v['rule_sev']] += 1
+ 
+  sorted_vulns = {k: v for k, v in sorted(vulns.items(), key=lambda item: item[1]['rule_sev'], reverse=True)}
+ 
+  body = {
+        'head': head,
+        'conf': conf,
+        'vulns': sorted_vulns,
+        'vuln_count':vuln_count,
+        'version':VERSION,
+  }
+  html = template.render(json_data=body).replace(u"\u2018", "'").replace(u"\u2019", "'")
+
+  f = open('reports/' + filename, "w")
+  f.write(html)
+  f.close()
+
+  return filename
+
+def generate_html_inspec(vulns, head, conf):
+  vuln_count = {'failed':0, 'passed':0, 'skipped':0}
+  filename = 'report-{}-{}.html'.format(utils.generate_uuid(), utils.get_date())
+  templateLoader = jinja2.FileSystemLoader(searchpath="./templates/")
+  templateEnv = jinja2.Environment(loader=templateLoader)
+  TEMPLATE_FILE = "report_template_inspec.html"
+  template = templateEnv.get_template(TEMPLATE_FILE)
+
+  for k, v in vulns.items():
+    vuln_count[v['result_status']] += 1
+
+  sorted_vulns = {k: v for k, v in sorted(vulns.items(), key=lambda item: item[1]['control_id'], reverse=True)}
+
+  body = {
+        'head': head,
+        'conf': conf,
+        'vuln_count':vuln_count,
+        'vulns': sorted_vulns,
+        'version':VERSION,
+  }
+  html = template.render(json_data=body).replace(u"\u2018", "'").replace(u"\u2019", "'")
+
+  f = open('reports/' + filename, "w")
+  f.write(html)
+  f.close()
+
   return filename
 
 def generate_txt(vulns):

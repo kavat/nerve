@@ -1,8 +1,10 @@
 import threading
 
-from bin.scanner    import scanner
-from bin.attacker   import attacker
-from bin.scheduler  import scheduler
+from bin.scanner     import scanner
+from bin.attacker    import attacker
+from bin.scheduler   import scheduler
+from bin.cve_scanner import cve_scanner
+from bin.inspec      import inspec_scanner
 
 
 def start_workers():
@@ -11,8 +13,18 @@ def start_workers():
   thread.daemon = True
   thread.start()
 
-  thread = threading.Thread(target=attacker)
-  thread.name = "attacker"
+  #thread = threading.Thread(target=attacker)
+  #thread.name = "attacker"
+  #thread.daemon = True
+  #thread.start()
+
+  thread = threading.Thread(target=cve_scanner)
+  thread.name = "cve_scanner"
+  thread.daemon = True
+  thread.start()
+
+  thread = threading.Thread(target=inspec_scanner)
+  thread.name = "inspec_scanner"
   thread.daemon = True
   thread.start()
 
