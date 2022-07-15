@@ -99,8 +99,115 @@
                               </div>
                               <div class="tab-pane fade" id="config" role="tabpanel" aria-labelledby="config-tab">
 
-                                  <div class="col-md-6">
-                                    <label for="" class="form-control-label"><b>Assessment Configuration</b></label><br>
+                                <div class="col-md-6">
+
+                                  <label for="" class="form-control-label"><b>Assessment Configuration</b></label><br><br>
+                                  <div class="form-group">
+                                    <label for="" class="form-control-label">Enable Network Scan</label>
+                                    <div class="custom-control custom-switch">
+                                      <input type="checkbox" onclick='display_data("network");' class="custom-control-input" name="network_scan_enable" id="network_scan_enable">
+                                      <label class="custom-control-label" for="network_scan_enable"></label>
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="" class="form-control-label">Enable CVE Scan</label>
+                                    <div class="custom-control custom-switch">
+                                      <input type="checkbox" onclick='display_data("cve");' class="custom-control-input" name="cve_scan_enable" id="cve_scan_enable">
+                                      <label class="custom-control-label" for="cve_scan_enable"></label>
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="" class="form-control-label">Enable Inspec Scan</label>
+                                    <div class="custom-control custom-switch">
+                                      <input type="checkbox" onclick='display_data("inspec");' class="custom-control-input" name="inspec_scan_enable" id="inspec_scan_enable">
+                                      <label class="custom-control-label" for="inspec_scan_enable"></label>
+                                    </div>
+                                  </div>
+
+                                  <div id="cve_settings" style="display:none;">
+                                  <label for="" class="form-control-label"><b>CVE Scan Configuration</b></label><br><br>
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                      <label for="" class="form-control-label">Username for CVE Scan (SSH)</label>
+                                      <input type="text" class="form-control" name="cve_username_ssh" id="cve_username_ssh placeholder="username">
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                    <label for="" class="form-control-label">Password for CVE Scan (SSH)</label>
+                                      <input type="text" class="form-control" name="cve_password_ssh" id="cve_password_ssh placeholder="password">
+                                    </div>
+                                  </div>                                       
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                    <label for="" class="form-control-label">Type of OS packages</label>
+                                      <select id='package_type' name='package_type'>
+                                        <option value=''></option>
+                                        <option value='rpm'>RPM</option>
+                                        <option value='deb'>DEB</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  </div>
+
+                                  <div id="inspec_settings" style="display:none;">
+                                  <label for="" class="form-control-label"><b>Inspec Scan Configuration</b></label><br><br>
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                    <label for="" class="form-control-label">Username for Inspec Scan (SSH)</label>
+                                      <input type="text" class="form-control" name="inspec_username_ssh" id="inspec_username_ssh placeholder="username">
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                    <label for="" class="form-control-label">Password for Inspec Scan (SSH)</label>
+                                      <input type="text" class="form-control" name="inspec_password_ssh" id="inspec_password_ssh placeholder="password">
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                    <label for="" class="form-control-label">Host OS</label>
+                                      <select id='os_inspec' name='os_inspec'>
+                                        <option value=''></option>
+                                        <option value='linux'>Linux</option>
+                                        <option value='windows'>Windows</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <div class="custom-control custom-switch">
+                                    <label for="" class="form-control-label">Profile to run</label>
+                                      <select id='profile_inspec' name='profile_inspec'>
+                                        <option value=''></option>
+                                        <option value='devsec/linux-baseline'>Linux baseline</option>
+                                        <option value='devsec/windows-baseline'>Windows baseline</option>
+                                        <option value='devsec/cis-dil-benchmark'>CIS benchmark (Linux)</option>
+                                      </select>
+                                    </div>
+                                  </div>
+                                  </div>
+
+                                    <div id="network_settings" style="display:none;">     
+                                  <label for="" class="form-control-label"><b>Network Scan Configuration</b></label><br><br>
+                                  <div class="form-group">
+                                    <label for="" class="form-control-label">Enable Internal Network Scan</label>
+                                    <div class="custom-control custom-switch">
+                                      <input type="checkbox" class="custom-control-input" name="network_scan_type" id="network_scan_type">
+                                      <label class="custom-control-label" for="network_scan_type"></abel>
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="" class="form-control-label">Username for Internal Scan (SSH)</label>
+                                    <div class="custom-control custom-switch">
+                                      <input type="text" class="form-control" name="network_username_ssh" id="network_username_ssh placeholder="username">
+                                    </div>
+                                  </div>
+                                  <div class="form-group">
+                                    <label for="" class="form-control-label">Password for Internal Scan (SSH)</label>
+                                    <div class="custom-control custom-switch">
+                                      <input type="text" class="form-control" name="network_password_ssh" id="network_password_ssh placeholder="password">
+                                    </div>
+                                  </div>
                                       <label for="" class="form-control-label">Aggressiveness Level</label>
                                       <div class="form-group">
                                         <select id="aggressive_level" name="aggressive_level" class="form-control">
@@ -113,14 +220,14 @@
                                       <div class="form-group">
                                         <label for="" class="form-control-label">Allow Outbound Internet Connections</label>
                                         <div class="custom-control custom-switch">
-                                          <input type="checkbox" class="custom-control-input" name="attempt_0" id="attempt_0" checked>
+                                          <input type="checkbox" class="custom-control-input" name="attempt_0" id="attempt_0">
                                           <label class="custom-control-label" for="attempt_0"></label>
                                       </div>
                                     </div>
                                     <div class="form-group">
                                         <label for="" class="form-control-label">Attempt Brute Force Attacks</label>
                                         <div class="custom-control custom-switch">
-                                          <input type="checkbox" class="custom-control-input" name="attempt_3" id="attempt_3" checked>
+                                          <input type="checkbox" class="custom-control-input" name="attempt_3" id="attempt_3">
                                           <label class="custom-control-label" for="attempt_3"></label>
                                       </div>
                                     </div>
@@ -184,9 +291,10 @@
                                             <option value="100">100</option>
                                           </select>
                                       </div>
-
+                                    </div> <!-- FINE -->
                                   </div>
                               </div>
+                              
 
                               <div class="tab-pane fade" id="dictionary" role="tabpanel" aria-labelledby="dictionary-tab">
                                 <div class="col-md-6">
@@ -275,6 +383,33 @@
             return text.replace(/\s+/g, '');
         }
 
+        function display_data(prefix){
+          if(document.getElementById(prefix + '_scan_enable').checked){
+            if(prefix == "network"){
+              document.getElementById('cve_settings').style.display = 'none';
+              document.getElementById('inspec_settings').style.display = 'none';
+              document.getElementById('cve_scan_enable').checked = false;
+              document.getElementById('inspec_scan_enable').checked = false;
+            }
+            if(prefix == "cve"){
+              document.getElementById('network_settings').style.display = 'none';
+              document.getElementById('inspec_settings').style.display = 'none';
+              document.getElementById('network_scan_enable').checked = false;
+              document.getElementById('inspec_scan_enable').checked = false;
+            }
+            if(prefix == "inspec"){
+              document.getElementById('cve_settings').style.display = 'none';
+              document.getElementById('network_settings').style.display = 'none';
+              document.getElementById('cve_scan_enable').checked = false;
+              document.getElementById('network_scan_enable').checked = false;
+            }
+            document.getElementById(prefix + '_settings').style.display = 'block';
+          }
+          else{
+            document.getElementById(prefix + '_settings').style.display = 'none';
+          }
+        }
+
         function submit_assessment(){
             var networks = []
             var exc_networks = []
@@ -285,6 +420,13 @@
             var title = document.getElementById("title").value
             var description = document.getElementById("description").value
             var engineer = document.getElementById("engineer").value
+            var scan_type = ""
+            var network_scan_type = "external"
+            var username_ssh = ""
+            var password_ssh = ""
+            var package_type = ""
+            var os_inspec = ""
+            var profile_inspec = ""
 
             var frequency = 'once'
             var aggressive_level = 3
@@ -297,6 +439,51 @@
             var parallel_scans = 10
             var parallel_attack = 10
 
+            if(document.getElementById("network_scan_enable")) {
+              if(document.getElementById("network_scan_enable").checked) {
+                scan_type = "nmap"
+                if(document.getElementById("network_scan_type").checked) {
+                  username_ssh = document.getElementById("network_username_ssh").value
+                  password_ssh = document.getElementById("network_password_ssh").value
+                }
+              }
+            }
+
+            if(document.getElementById("cve_scan_enable")) {
+              if(document.getElementById("cve_scan_enable").checked) {
+                scan_type = "cve"
+                username_ssh = document.getElementById("cve_username_ssh").value
+                password_ssh = document.getElementById("cve_password_ssh").value
+              }
+            }
+
+            if(document.getElementById("inspec_scan_enable")) {
+              if(document.getElementById("inspec_scan_enable").checked) {
+                scan_type = "inspec"
+                username_ssh = document.getElementById("inspec_username_ssh").value
+                password_ssh = document.getElementById("inspec_password_ssh").value
+              }
+            }
+
+            if(scan_type == "") {
+              toastr.warning("Scan type must be set.")
+              return;
+            }
+
+            if(document.getElementById("network_scan_type").checked) {
+              network_scan_type = "internal"
+            }
+
+            if(scan_type == "cve" || scan_type == "inspec" || (scan_type == "nmap" && network_scan_type == "internal")) {
+              if(username_ssh == "" || password_ssh == "") {
+                toastr.warning("Username and password cannot be empty for this type of scan.")
+                return;
+              }
+            }
+
+            if(document.getElementById("package_type")) {
+              package_type = document.getElementById("package_type").value
+            }
 
             if(title == '') {
                 toastr.warning("Assessment title must be set.")
@@ -341,19 +528,15 @@
                 domains = trim_whitespace(u_domains.value).split(",")
             }
 
-
             if (domains.length == 0 && networks.length == 0){
                 toastr.warning("Networks or Domains must be defined.")
                 return;
             }
 
-
-
             var e = document.getElementById("aggressive_level");
             if (e){
                 aggressive_level = parseInt(e.options[e.selectedIndex].value)
             }
-
 
             if (document.getElementById("attempt_0")){
                 outbound = document.getElementById("attempt_0").checked
@@ -402,6 +585,14 @@
             }
 
             var data = {
+                'type':scan_type,
+                'username_ssh':username_ssh,
+                'password_ssh':password_ssh,
+                'type_ie':network_scan_type,
+                'how':'automatic',
+                'package_type':package_type,
+                'os_inspec':os_inspec,
+                'profile_inspec':profile_inspec,
                 'targets':{
                     'networks':networks,
                     'excluded_networks':exc_networks,
@@ -453,6 +644,7 @@
             xhttp.send(JSON.stringify(data))
             return true;
         }
+
     </script>
 </body>
 </html>
