@@ -128,7 +128,7 @@ class RedisManager:
     self.store_json(key_hash, value)
  
   def store_inspec(self, value):
-    key = '{}{}'.format(value['host'], value['control_id'])
+    key = '{}{}{}'.format(value['host'], value['profile'], value['control_id'])
     key_hash = 'inspec_' + self.utils.hash_sha1(key)
 
     if self.r.exists(key_hash):
