@@ -92,9 +92,21 @@ def get_cves_by_cpes(thread_id, cpes, host):
               details = "Vulnerability related to {} found (CVSS3: {}, CVSS2: {})".format(cve_id, str(cvss3), str(cvss2))
               product_name = cpe.split(":")[0]
               product_version = cpe.split(":")[1]
-              attack_auth_req = result["access"]["authentication"]
-              attack_complexity = result["access"]["complexity"]
-              attack_vector = result["access"]["vector"]
+
+              try:
+                attack_auth_req = result["access"]["authentication"]
+              except:
+                attack_auth_req = ""
+
+              try:
+                attack_complexity = result["access"]["complexity"]
+              except:
+                attack_complexity = ""
+
+              try:
+                attack_vector = result["access"]["vector"]
+              excpet:
+                attack_vector = ""
 
               logger.info("Thread {} - host: {}".format(str(thread_id), host))
               logger.info("Thread {} - cve_id: {}".format(str(thread_id), cve_id))
