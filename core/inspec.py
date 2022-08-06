@@ -30,6 +30,7 @@ def get_inspec_analysis(thread_id, username, password, host, profile, os):
       for row in output_json["rows"]:
         try:
           row["host"] = host
+          row["profile"] = profile 
           rds.store_inspec(row)
         except Exception as e_redis:
           log_exception("Thread {} - Redis error: {}".format(thread_id, str(e_redis)))
