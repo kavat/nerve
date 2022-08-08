@@ -105,7 +105,7 @@ def get_cves_by_cpes(thread_id, cpes, host):
 
               try:
                 attack_vector = result["access"]["vector"]
-              excpet:
+              except:
                 attack_vector = ""
 
               logger.info("Thread {} - host: {}".format(str(thread_id), host))
