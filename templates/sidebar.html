@@ -1,3 +1,32 @@
+<script>
+  var elencoMenu = {};
+  elencoMenu['network'] = "open";
+
+  function setMenu(elementi, prop) {
+    for(var i = 0; i < elementi.length; i++) {
+      elementi[i].style.display = prop;
+    }
+  }
+
+  function manageMenu(menu){
+    var elementi = document.getElementsByClassName(menu);
+    if(location.href.includes("/qs") || location.href.includes("/agentscan") || location.href.includes("/assets") || location.href.includes("/topology")) {
+      elencoMenu[menu] = "open";
+      setMenu(elementi, 'block');
+    }
+    else {
+      if(elencoMenu[menu] == "open") {
+        elencoMenu[menu] = "close";
+        setMenu(elementi, 'none');
+      }
+      else {
+        elencoMenu[menu] = "open";
+        setMenu(elementi, 'block');
+      }
+    }      
+  }
+</script>
+
 <div class="wrapper">
         <nav id="sidebar">
             <div class="sidebar-header">
@@ -10,11 +39,20 @@
                 <a href="/dashboard"><i class="fas fa-home"></i> Dashboard</a>
                </li>
               <li>
+                <a onclick="javascript:manageMenu('network');"><i class="fas fa-syringe"></i> Network Analysis</a>
+              </li>
+              <li class="network" style="display: none; background-color: #254142">
                 <a href="/qs"><i class="fas fa-syringe"></i> External Scan</a>
                </li>
-              <li>
+              <li class="network" style="display: none; background-color: #254142">
                 <a href="/agentscan"><i class="fas fa-syringe"></i> Internal Scan</a>
                </li>
+               <li class="network" style="display: none; background-color: #254142">
+                <a href="/assets"><i class="fas fa-laptop"></i> Assets found</a>
+              </li>
+              <li class="network" style="display: none; background-color: #254142">
+                <a href="/topology"><i class="fas fa-network-wired"></i> Network Discovered</a>
+              </li>
               <li>
                <a href="/cvescan"><i class="fas fa-syringe"></i> CVEs analysis</a>
               </li>
@@ -22,14 +60,8 @@
                <a href="/inspecscan"><i class="fas fa-syringe"></i> Inspec analysis</a>
               </li>
                <li>
-                <a href="/assets"><i class="fas fa-laptop"></i> Assets found</a>
-              </li>
-               <li>
                 <a href="/assessment"><i class="fas fa-crosshairs"></i> Assessment settings</a>
               </li>
-               <li>
-                <a href="/topology"><i class="fas fa-network-wired"></i> Network Discovered</a>
-                </li>
                 <li>
                     <a href="/vulnerabilities"><i class="fas fa-bug"></i> Vulnerabilities found</a>
                 </li>
@@ -64,3 +96,7 @@
         </nav>
 
 </div>
+
+<script>
+  manageMenu("network");
+</script>
