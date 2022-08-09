@@ -192,16 +192,16 @@
   {% for key, value in json_data.vulns.items() %}
   {% if value.color != 0 %}
   <tr>
-      <th class='sev_{{value.color}}'>PROFILE</th>
-      <th class='sev_{{value.color}}'>{{value.profile}}</th>
-  </tr>
-  <tr>
       <th class='sev_{{value.color}}'>CONTROL</th>
-      <th class='sev_{{value.color}}'>{{value.control_title}}</th>
+      <th class='sev_{{value.color}}'>{{value.profile}} - {{value.control_title}}</th>
   </tr>
   <tr>
       <th class='sev_{{value.color}}'>DESCRIPTION</th>
       <td>{{value.control_desc}}</td>
+  </tr>
+  <tr>
+      <th class='sev_{{value.color}}'>HOST</th>
+      <td>{{value.host}}</td>
   </tr>
   <tr>
       <th class='sev_{{value.color}}'>IMPACT</th>
