@@ -68,8 +68,10 @@ def split_array(a, n):
 def get_cves_by_cpes(thread_id, cpes, host):
   logger.info("Thread {} - Start".format(str(thread_id)))
   try:
-    for cpe in cpes:
+    for cpe_full in cpes:
       try:
+        type_vuln = cpe_full.split(";")[0]
+        cpe = cpe_full.split(";")[1]
         url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
         logger.info("Thread {} - Launching GET request to {}".format(str(thread_id), url))
         r = requests.get(url)
@@ -119,6 +121,7 @@ def get_cves_by_cpes(thread_id, cpes, host):
               logger.info("Thread {} - attack_auth_req: {}".format(str(thread_id), attack_auth_req))
               logger.info("Thread {} - attack_complexity: {}".format(str(thread_id), attack_complexity))
               logger.info("Thread {} - attack_vector: {}".format(str(thread_id), attack_vector))
+              logger.info("Thread {} - type_vuln: {}".format(str(thread_id), type_vuln))
 
               details = "Please consider the linked references below in order to investigate the vulnerability:<br><br>{}".format("<br>".join(result['references']))
               rds.store_cve({
@@ -137,7 +140,8 @@ def get_cves_by_cpes(thread_id, cpes, host):
                 'product_version':pulisci(product_version, "product_version"),
                 'attack_auth_req':pulisci(attack_auth_req, "attack_auth_req"),
                 'attack_complexity':pulisci(attack_complexity, "attack_complexity"),
-                'attack_vector':pulisci(attack_vector, "attack_vector")
+                'attack_vector':pulisci(attack_vector, "attack_vector"),
+                'type_vuln':pulisci(type_vuln, "type_vuln")
               })
           except Exception as e_store:
             log_exception("Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
@@ -171,7 +175,8 @@ def insert_rds_cve_error(host, error, cpe, product_name, product_version):
     'product_version':product_version,
     'attack_auth_req':'N/A',
     'attack_complexity':'N/A',
-    'attack_vector':'N/A'
+    'attack_vector':'N/A',
+    'type_vuln':'N/A'
   })
 
 def get_severity(cvss3, cvss2):
