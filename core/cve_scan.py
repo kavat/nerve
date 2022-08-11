@@ -1,6 +1,7 @@
 import time
 import requests
 import config
+import traceback
 
 from core.logging import logger
 from threading    import Thread
@@ -16,7 +17,7 @@ def get_cves_from_packages(cpe_list, host):
       cpe_list_splitted = list(split_array(cpe_list, 1))
   except Exception as e_split:
     log_exception(str(e_split))
-    rds.save_error("CVE_SCAN THREAD", "get_cves_from_packages", str(e_split))
+    rds.save_error("CVE_SCAN THREAD", "get_cves_from_packages", str(e_split), str(traceback.format_exc()))
   else:
     logger.info("Array splitted..")
 
@@ -37,7 +38,7 @@ def get_cve_from_list(cpe_list_splitted, host):
         t.start()
     except Exception as e:
       log_exception(str(e))
-      rds.save_error("CVE_SCAN THREAD", "get_cve_from_list", str(e))
+      rds.save_error("CVE_SCAN THREAD", "get_cve_from_list", str(e), str(traceback.format_exc()))
 
     for t in threads:
       logger.info("Wait for thread end..")
@@ -58,7 +59,7 @@ def pulisci(stringa, chiave = ""):
     return str(bytes(stringa, 'utf-8').decode('utf-8', 'ignore'))
   except Exception as e:
     logger.error("Key {} Value {}".format(stringa, chiave))
-    rds.save_error("CVE_SCAN THREAD", "pulisci", "Key {} Value {}".format(stringa, chiave))
+    rds.save_error("CVE_SCAN THREAD", "pulisci", "Key {} Value {}: {}".format(stringa, chiave, str(e)), str(traceback.format_exc()))
     return stringa
 
 def split_array(a, n):
@@ -146,17 +147,17 @@ def get_cves_by_cpes(thread_id, cpes, host):
                 })
             except Exception as e_store:
               log_exception("Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
-              rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
+              rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)), str(traceback.format_exc()))
           else:
             logger.error("Thread {} - Status not 200, error {} to manage in response".format(str(thread_id), str(r.status_code)))
             insert_rds_cve_error(pulisci(host, "host"), "CVEs unavailable: {}".format(str(r.status_code)), pulisci(cpe, "cpe"), pulisci(product_name, "product_name"), pulisci(product_version, "product_version"))
         except Exception as e:
           log_exception("Thread {} - Exception: {}".format(str(thread_id),str(e)))
-          rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception: {}".format(str(thread_id),str(e)))
+          rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception: {}".format(str(thread_id),str(e)), str(traceback.format_exc()))
           insert_rds_cve_error(pulisci(host, "host"), "CVEs unavailable: {}".format(str(e)), pulisci(cpe, "cpe"), pulisci(product_name, "product_name"), pulisci(product_version, "product_version"))
   except Exception as e_thread_main:
     log_exception("Thread {} - Exception: {}".format(str(thread_id), str(e_thread_main)))
-    rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception main: {}".format(str(thread_id), str(e_thread_main)))
+    rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception main: {}".format(str(thread_id), str(e_thread_main)), str(traceback.format_exc()))
   logger.info("Thread {} - End".format(str(thread_id)))
 
 def insert_rds_cve_error(host, error, cpe, product_name, product_version):

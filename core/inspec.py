@@ -4,6 +4,7 @@ import config
 import os
 import shutil
 import json
+import traceback
 
 from git          import Repo
 from pathlib      import Path
@@ -34,10 +35,10 @@ def get_inspec_analysis(thread_id, username, password, host, profile, os):
           rds.store_inspec(row)
         except Exception as e_redis:
           log_exception("Thread {} - Redis error: {}".format(thread_id, str(e_redis)))
-          rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Redis error: {}".format(thread_id, str(e_redis)))
+          rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Redis error: {}".format(thread_id, str(e_redis)), str(traceback.format_exc()))
     else:
       logger.error("Thread {} - Status not 200")
-      rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Status not 200")
+      rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Status not 200", '')
   except Exception as e:
     log_exception("Thread {} - Exception main: {}".format(thread_id, str(e)))
-    rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Exception main: {}".format(thread_id, str(e)))
+    rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Exception main: {}".format(thread_id, str(e)), str(traceback.format_exc()))

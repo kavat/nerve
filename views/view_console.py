@@ -1,3 +1,4 @@
+from random import randint
 from core.security import session_required
 from flask import Blueprint, render_template
 
@@ -7,4 +8,5 @@ console = Blueprint('console', __name__,
 @console.route('/console')
 @session_required
 def view_console():
-  return render_template('console.html')
+  value_random = randint(1000,9999)
+  return render_template('console.html', value_random=value_random)

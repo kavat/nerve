@@ -23,6 +23,11 @@ pre.bash {
   color: white;
   padding: 8px;
   font-family: courier new;
+  height: auto;
+  max-height: 500px;
+  width: auto;
+  max-width: 1200px;
+  overflow: scroll;
 }
 
 pre.topology {

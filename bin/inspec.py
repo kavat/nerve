@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from core.inspec  import get_inspec_analysis
 from core.redis   import rds
@@ -45,14 +46,14 @@ def inspec_scanner():
           get_inspec_analysis("INSPEC", username_ssh, password_ssh, list(ip.keys())[0], profile_inspec, os_inspec)
         except Exception as e_get:
           log_exception("INSPEC - Exception: {}".format(str(e_get)))
-          rds.save_error("INSPEC', 'inspec_scanner', 'Exception: {}".format(str(e_get)))
+          rds.save_error("INSPEC', 'inspec_scanner', 'Exception: {}".format(str(e_get)), str(traceback.format_exc()))
       else:
         logger.error("INSPEC - Parameters missed")
-        rds.save_error("INSPEC', 'inspec_scanner', 'Parameters missed")
+        rds.save_error("INSPEC', 'inspec_scanner', 'Parameters missed", '')
 
       rds.set_force_end_session()
 
   except Exception as e_global:
     log_exception("INSPEC - Exception global: {}".format(str(e_global)))
-    rds.save_error("INSPEC', 'inspec_scanner', 'Exception global: {}".format(str(e_global)))
+    rds.save_error("INSPEC', 'inspec_scanner', 'Exception global: {}".format(str(e_global)), str(traceback.format_exc()))
     rds.set_force_end_session()

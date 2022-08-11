@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from core.cve_scan       import get_cves_from_packages
 from core.redis          import rds
@@ -49,7 +50,7 @@ def cve_scanner():
             cpe_list = command_sender.get_local_cpe_list()
             logger.info("CVE_SCANNER - cpe_list: " + str(cpe_list))
           except Exception as e:
-            rds.save_error("CVE_SCANNER", "cve_scanner", "Failed to execute command to get CPE list {}, exception: {}".format(str(cpe_list), str(e)))
+            rds.save_error("CVE_SCANNER", "cve_scanner", "Failed to execute command to get CPE list {}, exception: {}".format(str(cpe_list), str(e)), str(traceback.format_exc()))
             log_exception("CVE_SCANNER - Failed to execute command to get CPE list {}, exception: {}".format(str(cpe_list), str(e)))
         else:
           logger.error("CVE_SCANNER - Parameters missed")
@@ -60,7 +61,7 @@ def cve_scanner():
           f = open("{}/{}".format(UPLOAD_FOLDER, file_uploaded), "r")
           cpe_list = f.read().split("\n")
         except Exception as e_set:
-          rds.save_error("CVE_SCANNER", "cve_scanner", "Exception: {}".format(str(e_set)))
+          rds.save_error("CVE_SCANNER", "cve_scanner", "Exception: {}".format(str(e_set)), str(traceback.format_exc()))
           log_exception("CVE_SCANNER - Exception: {}".format(str(e_set)))
         
       if len(cpe_list) > 0:
@@ -68,7 +69,7 @@ def cve_scanner():
         try:
           get_cves_from_packages(cpe_list, list(ip.keys())[0])
         except Exception as e_get:
-          rds.save_error("CVE_SCANNER", "cve_scanner", "Exception: {}".format(str(e_get)))
+          rds.save_error("CVE_SCANNER", "cve_scanner", "Exception: {}".format(str(e_get)), str(traceback.format_exc()))
           log_exception("CVE_SCANNER - Exception: {}".format(str(e_get)))
       else:
         logger.info("CVE_SCANNER - CPE list equal to zero")
@@ -77,5 +78,5 @@ def cve_scanner():
 
   except Exception as e_global:
     log_exception("CVE_SCANNER - Exception global: {}".format(str(e_global)))
-    rds.save_error("CVE_SCANNER", "cve_scanner", "Exception global: {}".format(str(e_global)))
+    rds.save_error("CVE_SCANNER", "cve_scanner", "Exception global: {}".format(str(e_global)), str(traceback.format_exc()))
     rds.set_force_end_session()
