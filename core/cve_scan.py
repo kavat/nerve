@@ -69,90 +69,91 @@ def get_cves_by_cpes(thread_id, cpes, host):
   logger.info("Thread {} - Start".format(str(thread_id)))
   try:
     for cpe_full in cpes:
-      try:
-        type_vuln = cpe_full.split(";")[0]
-        cpe = cpe_full.split(";")[1]
-        url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
-        logger.info("Thread {} - Launching GET request to {}".format(str(thread_id), url))
-        r = requests.get(url)
-        logger.info("Thread {} - Call ended with status {}".format(str(thread_id), str(r.status_code)))
-        if r.status_code == 200:
-          ritorno = r.json()
-          try:
-            for result in ritorno['results']:
-              cve_id = result['id']
-              cvss = 'ND'
-              cvss3 = ''
-              cvss2 = ''
-              if 'cvss3' in result:
-                cvss3 = result['cvss3']
-              if 'cvss' in result:
-                cvss2 = result['cvss']
-              cvss = get_severity(cvss3, cvss2)
-              summary = result['summary'].replace(u"\u2018", "'").replace(u"\u2019", "'")
-              mitigations = "Please consider the linked references below in order to investigate the vulnerability:<br><br>{}".format("<br>".join(result['references']))
-              details = "Vulnerability related to {} found (CVSS3: {}, CVSS2: {})".format(cve_id, str(cvss3), str(cvss2))
-              product_name = cpe.split(":")[0]
-              product_version = cpe.split(":")[1]
+      if cpe_full != "" and len(cpe_full.split(";")) == 2:
+        try:
+          type_vuln = cpe_full.split(";")[0]
+          cpe = cpe_full.split(";")[1]
+          url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
+          logger.info("Thread {} - Launching GET request to {}".format(str(thread_id), url))
+          r = requests.get(url)
+          logger.info("Thread {} - Call ended with status {}".format(str(thread_id), str(r.status_code)))
+          if r.status_code == 200:
+            ritorno = r.json()
+            try:
+              for result in ritorno['results']:
+                cve_id = result['id']
+                cvss = 'ND'
+                cvss3 = ''
+                cvss2 = ''
+                if 'cvss3' in result:
+                  cvss3 = result['cvss3']
+                if 'cvss' in result:
+                  cvss2 = result['cvss']
+                cvss = get_severity(cvss3, cvss2)
+                summary = result['summary'].replace(u"\u2018", "'").replace(u"\u2019", "'")
+                mitigations = "Please consider the linked references below in order to investigate the vulnerability:<br><br>{}".format("<br>".join(result['references']))
+                details = "Vulnerability related to {} found (CVSS3: {}, CVSS2: {})".format(cve_id, str(cvss3), str(cvss2))
+                product_name = cpe.split(":")[0]
+                product_version = cpe.split(":")[1]
 
-              try:
-                attack_auth_req = result["access"]["authentication"]
-              except:
-                attack_auth_req = ""
+                try:
+                  attack_auth_req = result["access"]["authentication"]
+                except:
+                  attack_auth_req = ""
 
-              try:
-                attack_complexity = result["access"]["complexity"]
-              except:
-                attack_complexity = ""
+                try:
+                  attack_complexity = result["access"]["complexity"]
+                except:
+                  attack_complexity = ""
 
-              try:
-                attack_vector = result["access"]["vector"]
-              except:
-                attack_vector = ""
+                try:
+                  attack_vector = result["access"]["vector"]
+                except:
+                  attack_vector = ""
 
-              logger.info("Thread {} - host: {}".format(str(thread_id), host))
-              logger.info("Thread {} - cve_id: {}".format(str(thread_id), cve_id))
-              logger.info("Thread {} - sev: {}".format(str(thread_id), str(cvss)))
-              logger.info("Thread {} - summary: {}".format(str(thread_id), summary))
-              logger.info("Thread {} - details: {}".format(str(thread_id), details))
-              logger.info("Thread {} - mitigations: {}".format(str(thread_id), mitigations))
-              logger.info("Thread {} - product_name: {}".format(str(thread_id), product_name))
-              logger.info("Thread {} - product_version: {}".format(str(thread_id), product_version))
-              logger.info("Thread {} - attack_auth_req: {}".format(str(thread_id), attack_auth_req))
-              logger.info("Thread {} - attack_complexity: {}".format(str(thread_id), attack_complexity))
-              logger.info("Thread {} - attack_vector: {}".format(str(thread_id), attack_vector))
-              logger.info("Thread {} - type_vuln: {}".format(str(thread_id), type_vuln))
+                logger.info("Thread {} - host: {}".format(str(thread_id), host))
+                logger.info("Thread {} - cve_id: {}".format(str(thread_id), cve_id))
+                logger.info("Thread {} - sev: {}".format(str(thread_id), str(cvss)))
+                logger.info("Thread {} - summary: {}".format(str(thread_id), summary))
+                logger.info("Thread {} - details: {}".format(str(thread_id), details))
+                logger.info("Thread {} - mitigations: {}".format(str(thread_id), mitigations))
+                logger.info("Thread {} - product_name: {}".format(str(thread_id), product_name))
+                logger.info("Thread {} - product_version: {}".format(str(thread_id), product_version))
+                logger.info("Thread {} - attack_auth_req: {}".format(str(thread_id), attack_auth_req))
+                logger.info("Thread {} - attack_complexity: {}".format(str(thread_id), attack_complexity))
+                logger.info("Thread {} - attack_vector: {}".format(str(thread_id), attack_vector))
+                logger.info("Thread {} - type_vuln: {}".format(str(thread_id), type_vuln))
 
-              details = "Please consider the linked references below in order to investigate the vulnerability:<br><br>{}".format("<br>".join(result['references']))
-              rds.store_cve({
-                'ip':pulisci(host, "host"),
-                'cve_id':pulisci(cve_id, "cve_id"),
-                'rule_id':'CVEs',
-                'rule_sev':cvss,
-                'rule_desc':pulisci(summary, "summary"),
-                'rule_confirm':'Vulnerabilities Found',
-                'rule_details':pulisci(details, "details"),
-                'rule_mitigation':pulisci(mitigations, "mitigations"),
-                'cvss3':pulisci(cvss3, "cvss3"),
-                'cvss2':pulisci(cvss2, "cvss2"),
-                'cpe':pulisci(cpe, "cpe"),
-                'product_name':pulisci(product_name, "product_name"),
-                'product_version':pulisci(product_version, "product_version"),
-                'attack_auth_req':pulisci(attack_auth_req, "attack_auth_req"),
-                'attack_complexity':pulisci(attack_complexity, "attack_complexity"),
-                'attack_vector':pulisci(attack_vector, "attack_vector"),
-                'type_vuln':pulisci(type_vuln, "type_vuln")
-              })
-          except Exception as e_store:
-            log_exception("Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
-            rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
-        else:
-          logger.error("Thread {} - Status not 200, error {} to manage in response".format(str(thread_id), str(r.status_code)))
-          insert_rds_cve_error(pulisci(host, "host"), "CVEs unavailable: {}".format(str(r.status_code)), pulisci(cpe, "cpe"), pulisci(product_name, "product_name"), pulisci(product_version, "product_version"))
-      except Exception as e:
-        log_exception("Thread {} - Exception: {}".format(str(thread_id),str(e)))
-        rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception: {}".format(str(thread_id),str(e)))
-        insert_rds_cve_error(pulisci(host, "host"), "CVEs unavailable: {}".format(str(e)), pulisci(cpe, "cpe"), pulisci(product_name, "product_name"), pulisci(product_version, "product_version"))
+                details = "Please consider the linked references below in order to investigate the vulnerability:<br><br>{}".format("<br>".join(result['references']))
+                rds.store_cve({
+                  'ip':pulisci(host, "host"),
+                  'cve_id':pulisci(cve_id, "cve_id"),
+                  'rule_id':'CVEs',
+                  'rule_sev':cvss,
+                  'rule_desc':pulisci(summary, "summary"),
+                  'rule_confirm':'Vulnerabilities Found',
+                  'rule_details':pulisci(details, "details"),
+                  'rule_mitigation':pulisci(mitigations, "mitigations"),
+                  'cvss3':pulisci(cvss3, "cvss3"),
+                  'cvss2':pulisci(cvss2, "cvss2"),
+                  'cpe':pulisci(cpe, "cpe"),
+                  'product_name':pulisci(product_name, "product_name"),
+                  'product_version':pulisci(product_version, "product_version"),
+                  'attack_auth_req':pulisci(attack_auth_req, "attack_auth_req"),
+                  'attack_complexity':pulisci(attack_complexity, "attack_complexity"),
+                  'attack_vector':pulisci(attack_vector, "attack_vector"),
+                  'type_vuln':pulisci(type_vuln, "type_vuln")
+                })
+            except Exception as e_store:
+              log_exception("Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
+              rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
+          else:
+            logger.error("Thread {} - Status not 200, error {} to manage in response".format(str(thread_id), str(r.status_code)))
+            insert_rds_cve_error(pulisci(host, "host"), "CVEs unavailable: {}".format(str(r.status_code)), pulisci(cpe, "cpe"), pulisci(product_name, "product_name"), pulisci(product_version, "product_version"))
+        except Exception as e:
+          log_exception("Thread {} - Exception: {}".format(str(thread_id),str(e)))
+          rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception: {}".format(str(thread_id),str(e)))
+          insert_rds_cve_error(pulisci(host, "host"), "CVEs unavailable: {}".format(str(e)), pulisci(cpe, "cpe"), pulisci(product_name, "product_name"), pulisci(product_version, "product_version"))
   except Exception as e_thread_main:
     log_exception("Thread {} - Exception: {}".format(str(thread_id), str(e_thread_main)))
     rds.save_error("CVE_SCAN THREAD", "get_cves_by_cpes", "Thread {} - Exception main: {}".format(str(thread_id), str(e_thread_main)))

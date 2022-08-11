@@ -290,6 +290,9 @@ class ConfParser:
   def get_how_config(self):
     return self.values['how']
 
+  def get_file_uploaded_config(self):
+    return self.values['file_uploaded']
+
   def get_username_ssh_config(self):
     return self.values['username_ssh']
 

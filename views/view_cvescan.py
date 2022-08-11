@@ -7,6 +7,7 @@ from core.parser import SchemaParser
 from core.register  import Register
 from core.logging   import logger
 from core.command_sender import CommandSender
+from werkzeug.utils import secure_filename
 
 from flask import (
   Blueprint,
@@ -18,6 +19,36 @@ from flask import (
 
 cvescan = Blueprint('cvescan', __name__,
                 template_folder='templates')
+
+@cvescan.route('/cvescanfromfile', methods=['POST'])
+@session_required
+def view_cvescanfromfile():
+  if request.method == 'POST':
+    register = Register()
+    ip = request.values.get('ip')
+    f = request.files['file']
+    try:
+      f.save("{}/{}".format(config.UPLOAD_FOLDER,f.filename))
+      scan = copy.deepcopy(config.DEFAULT_SCAN)
+      scan['type'] = 'cve'
+      scan['targets']['networks'].append(ip)
+      scan['file_uploaded'] = f.filename
+      schema = SchemaParser(scan, request)
+      vfd, msg, scan = schema.verify()
+
+      if vfd:
+        res, code, msg = register.scan(scan)
+        if res:
+          logger.info('A CVE scan was initiated')
+          flash('CVE scan started.', 'success')
+        else:
+          flash(msg, 'error')
+      else:
+        flash(msg, 'error')
+    except Exception as e:
+      flash(str(e), 'error')
+
+  return render_template('cpescan.html')
 
 @cvescan.route('/cvescan', methods=['GET','POST'])
 @session_required
@@ -33,6 +64,7 @@ def view_cvescan():
       logger.info("Start CVE request..")
       scan = copy.deepcopy(config.DEFAULT_SCAN)
       scan['type'] = 'cve'
+      scan['file_uploaded'] = "none" 
       scan['username_ssh'] = username_ssh
       scan['password_ssh'] = password_ssh
       scan['package_type'] = package_type
