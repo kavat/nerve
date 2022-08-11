@@ -1,6 +1,7 @@
 import requests
 import nmap
 import config
+import traceback
 
 from core.utils   import Utils
 from core.triage  import Triage
@@ -54,10 +55,10 @@ class Scanner():
       logger.info("Post scan execution..")
     except nmap.nmap.PortScannerError as e:
       logger.error('Error with scan. {}'.format(e))
-      rds.save_error('PORT SCANNER', 'scan', 'Nmap error with scan. {}'.format(egen))
+      rds.save_error('PORT SCANNER', 'scan', 'Nmap error with scan. {}'.format(e), str(traceback.format_exc()))
     except Exception as egen:
       logger.error('Generic error with scan. {}'.format(egen))
-      rds.save_error('PORT SCANNER', 'scan', 'Generic error with scan. {}'.format(egen))
+      rds.save_error('PORT SCANNER', 'scan', 'Generic error with scan. {}'.format(egen), str(traceback.format_exc()))
    
     if 'scan' in result:  
       for host, res in result['scan'].items():

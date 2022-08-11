@@ -1,5 +1,6 @@
 import time
 import threading
+import traceback
 
 from core.manager   import rule_manager
 from core.parser    import ConfParser
@@ -50,7 +51,7 @@ def attacker(conf):
       threads[i].start()
     except Exception as e:
       log_exception("ATTACKER THREAD - Exception on thread start: {}".format(str(e)))
-      rds.save_error("ATTACKER THREAD", "attacker", "Exception on thread start: {}".format(str(e)))
+      rds.save_error("ATTACKER THREAD", "attacker", "Exception on thread start: {}".format(str(e)), str(traceback.format_exc()))
 
   for t in threads:
     try:
@@ -58,6 +59,6 @@ def attacker(conf):
       t.join()
     except Exception as e:
       log_exception("ATTACKER THREAD - Exception on thread join: {}".format(str(e)))
-      rds.save_error("ATTACKER THREAD", "attacker", "Exception on thread join: {}".format(str(e)))
+      rds.save_error("ATTACKER THREAD", "attacker", "Exception on thread join: {}".format(str(e)), str(traceback.format_exc()))
 
   logger.info("Attacker threads terminated")

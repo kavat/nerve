@@ -37,15 +37,17 @@ class RedisManager:
   def store_topology(self, host):
     self.r.sadd("sess_topology", host)
 
-  def save_error(self, macro_name, func_name, message):
+  def save_error(self, macro_name, func_name, message, traceback_str):
     try:
+      traceback_str_base64 = base64.b64encode(traceback_str)
       date_time = self.utils.get_datetime()
       key = "error_{}_{}_{}".format(macro_name, func_name, date_time)
       json_object = {
         "datetime": date_time,
         "macro_name": macro_name,
         "func_name": func_name,
-        "message": message
+        "message": message,
+        "traceback_str": traceback_str_base64
       }
       self.store_json(key, json_object)
     except Exception as e:

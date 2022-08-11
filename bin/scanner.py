@@ -1,4 +1,5 @@
 import time
+import traceback
 
 from core.redis          import rds
 from core.logging        import logger
@@ -68,11 +69,11 @@ def scanner():
                 rds.store_topology(host)
         else:
           logger.error('NETWORK_SCANNER - no scan_data')
-          rds.save_error('NETWORK_SCANNER', 'scanner', 'no scan_data')
+          rds.save_error('NETWORK_SCANNER', 'scanner', 'no scan_data', '')
 
       else:
         logger.error('NETWORK_SCANNER - no host')
-        rds.save_error('NETWORK_SCANNER', 'scanner', 'no host')
+        rds.save_error('NETWORK_SCANNER', 'scanner', 'no host', '')
 
       attacker(conf)
 
@@ -80,6 +81,6 @@ def scanner():
 
   except Exception as e_global:
     log_exception("NETWORK_SCANNER - Exception global: {}".format(str(e_global)))
-    rds.save_error("NETWORK_SCANNER", "scanner", "Exception global: {}".format(str(e_global)))    
+    rds.save_error("NETWORK_SCANNER", "scanner", "Exception global: {}".format(str(e_global)), str(traceback.format_exc()))
 
   rds.set_force_end_session()
