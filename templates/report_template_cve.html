@@ -210,7 +210,10 @@
       <th class='sev_{{value.rule_sev}}'>FINDINGS</th>
       <td>{{value.rule_confirm}}</td>
   </tr>
-
+  <tr>
+      <th class='sev_{{value.rule_sev}}'>TYPE OF VULNERABILITY</th>
+      <td>{{value.type_vuln}}</td>
+  </tr>
   <tr>
       <th class='sev_{{value.rule_sev}}'>ADDRESS</th>
       <td>{{value.ip}} {% if value.domain %} ({{value.domain}}) {% endif %}</td>
