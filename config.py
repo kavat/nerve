@@ -86,3 +86,6 @@ DEFAULT_SCAN = {
     'frequency':'once'
   }
 }
+
+UPLOAD_FOLDER = '/tmp'
+MAX_CONTENT_PATH = 1000000000
