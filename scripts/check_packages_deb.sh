@@ -9,7 +9,7 @@ for protocol in tcp udp; do
 
     ip_binding_for_inode=$(cat /proc/net/$protocol | grep " 0[ ]\+$" | grep " $INODE " | awk -F' ' '{print $2}' | awk -F":" '{print $1}')
     type_vuln="internal"
-    if [ "$ip_binding_for_inode" != "0100007F" ] && [ "$ip_binding_for_inode" != "7F000001" ]; then
+    if [ "$ip_binding_for_inode" != "0100007F" ] && [ "$ip_binding_for_inode" != "7F000001" ] && [ "$ip_binding_for_inode" != "3500007F" ] && [ "$ip_binding_for_inode" != "7F000035" ]; then
       type_vuln="external"
     fi
 
@@ -17,7 +17,7 @@ for protocol in tcp udp; do
     librerie=$(find /proc -lname "socket:\\[$INODE\\]" 2>/dev/null | head -n 1 | awk -F "/" '{print "cat /proc/"$3"/maps"}' | bash | grep "\.so" | awk -F' ' '{print $6}' | awk -F'/' '{print $NF}' | sort -u)
     for libreria in $librerie; do
       for file_returned in $(dpkg -S $libreria | awk -F':' '{print $1}' | sort -u | awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
-        echo "$type_vuln;$file_returned" >> /tmp/appoggio
+        echo "${type_vuln};used;${file_returned}" >> /tmp/appoggio
       done
     done
 
@@ -25,7 +25,7 @@ for protocol in tcp udp; do
     for libreria in $librerie; do
       for libreria_linked in $(find / -type l -name $libreria 2>/dev/null | awk -F' ' '{print "ls -l "$1}' | bash | awk '{print $NF}'); do
         for file_returned in $(dpkg -S $libreria_linked | awk -F':' '{print $1}' | sort -u | awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
-          echo "$type_vuln;$file_returned" >> /tmp/appoggio
+          echo "${type_vuln};used;${file_returned}" >> /tmp/appoggio
         done
       done
     done
@@ -34,15 +34,15 @@ for protocol in tcp udp; do
     softwares=$(find /proc -lname "socket:\\[$INODE\\]" 2>/dev/null | head -n 1 | awk -F "/" '{print "cat /proc/"$3"/comm"}' | bash)
     for software in $softwares; do
       for file_returned in $(find / -type f -executable -name $software 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
-        echo "$type_vuln;$file_returned" >> /tmp/appoggio
+        echo "${type_vuln};executable;${file_returned}" >> /tmp/appoggio
       done
     done
 
     # OR LINKS A SPECIFIC EXECUTABLE FILES
     for software in $softwares; do
       for software_linked in $(find / -type l -name $software 2>/dev/null | awk -F' ' '{print "ls -l "$1}' | bash | awk '{print $NF}'); do
-	for file_returned in $(find / -type f -executable -name $software_linked 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
-          echo "$type_vuln;$file_returned" >> /tmp/appoggio
+        for file_returned in $(find / -type f -executable -name $software_linked 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
+          echo "${type_vuln};executable;${file_returned}" >> /tmp/appoggio
         done
       done
     done
@@ -51,19 +51,19 @@ for protocol in tcp udp; do
 
 done
 
-cat /tmp/appoggio | sed "s/\:\(.*\)___/___/g" | sed "s/___[^\:]\+\:/___/g" | grep "\(.*\)___[0-9\.]\+" -o | sed "s/\.$//g" | sed "s/___/\:/g" | sort -u
+cat /tmp/appoggio | sed "s/\:\(.*\)___/___/g" | sed "s/___[^\:]\+\:/___/g" | grep "\(.*\)___[0-9\.]\+" -o | sed "s/\.$//g" | sed "s/___/\:/g" | sort -u > /tmp/appoggio_as_rpm
 
-for riga in $(cat /tmp/appoggio | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u); do
+for riga in $(cat /tmp/appoggio_as_rpm); do
 
   type_vuln=$(echo $riga | awk -F';' '{print $1}')
-  pacchetto=$(echo $riga | awk -F';' '{print $2}' | awk -F':' '{print $1}')
-  version=$(echo $riga | awk -F';' '{print $2}' | awk -F':' '{print $2}')
+  type_package=$(echo $riga | awk -F';' '{print $2}')
+  pacchetto=$(echo $riga | awk -F';' '{print $3}' | awk -F':' '{print $1}')
+  version=$(echo $riga | awk -F';' '{print $3}' | awk -F':' '{print $2}')
 
-  check_lines=$(grep ";$pacchetto:$version" /tmp/appoggio | wc -l)
-  if [ $check_lines -eq 1 ]; then
-    echo $riga >> /tmp/ritorno
-  else
-    echo "external;${pacchetto}:${version}" >> /tmp/ritorno
-  fi
+  usability=$(grep ";${pacchetto}:${version}" /tmp/appoggio_as_rpm | awk -F';' '{print $1";"$2}' | sort -u | head -n1)
+  echo "${usability};${pacchetto}:${version}" >> /tmp/ritorno
 
 done
+
+cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used
+/g" | sed "s/internal;executable/internal_executable/g"
