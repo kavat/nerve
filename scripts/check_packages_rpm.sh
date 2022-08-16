@@ -1,3 +1,4 @@
+# RESET TEMP FILES
 > /tmp/appoggio
 > /tmp/ritorno
 
