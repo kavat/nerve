@@ -65,5 +65,4 @@ for riga in $(cat /tmp/appoggio_as_rpm); do
 
 done
 
-cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used
-/g" | sed "s/internal;executable/internal_executable/g"
+cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used/g" | sed "s/internal;executable/internal_executable/g"
