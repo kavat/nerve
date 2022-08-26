@@ -75,13 +75,13 @@ def get_cves_by_cpes(thread_id, cpes, host):
           type_vuln = cpe_full.split(";")[0]
           type_vuln_desc = ""
           if type_vuln == "external_used":
-            type_vuln_desc = "Package used by external socket binded"
+            type_vuln_desc = "Package with dependency used by external socket"
           if type_vuln == "external_executable":
-            type_vuln_desc = "Package opened external socket directly"
+            type_vuln_desc = "Package with executable used by external socket"
           if type_vuln == "internal_used":
-            type_vuln_desc = "Package used by internal socket binded"
+            type_vuln_desc = "Package with dependency used by internal socket"
           if type_vuln == "internal_executable":
-            type_vuln_desc = "Package opened internal socket directly"
+            type_vuln_desc = "Package with executable used by internal socket"
           cpe = cpe_full.split(";")[1]
           url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
           logger.info("Thread {} - Launching GET request to {}".format(str(thread_id), url))
