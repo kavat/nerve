@@ -73,6 +73,15 @@ def get_cves_by_cpes(thread_id, cpes, host):
       if cpe_full != "" and len(cpe_full.split(";")) == 2:
         try:
           type_vuln = cpe_full.split(";")[0]
+          type_vuln_desc = ""
+          if type_vuln == "external_used":
+            type_vuln_desc = "Package with dependency used by external socket"
+          if type_vuln == "external_executable":
+            type_vuln_desc = "Package with executable used by external socket"
+          if type_vuln == "internal_used":
+            type_vuln_desc = "Package with dependency used by internal socket"
+          if type_vuln == "internal_executable":
+            type_vuln_desc = "Package with executable used by internal socket"
           cpe = cpe_full.split(";")[1]
           url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
           logger.info("Thread {} - Launching GET request to {}".format(str(thread_id), url))
@@ -124,6 +133,7 @@ def get_cves_by_cpes(thread_id, cpes, host):
                 logger.info("Thread {} - attack_complexity: {}".format(str(thread_id), attack_complexity))
                 logger.info("Thread {} - attack_vector: {}".format(str(thread_id), attack_vector))
                 logger.info("Thread {} - type_vuln: {}".format(str(thread_id), type_vuln))
+                logger.info("Thread {} - type_vuln_desc: {}".format(str(thread_id), type_vuln_desc))
 
                 details = "Please consider the linked references below in order to investigate the vulnerability:<br><br>{}".format("<br>".join(result['references']))
                 rds.store_cve({
@@ -143,7 +153,7 @@ def get_cves_by_cpes(thread_id, cpes, host):
                   'attack_auth_req':pulisci(attack_auth_req, "attack_auth_req"),
                   'attack_complexity':pulisci(attack_complexity, "attack_complexity"),
                   'attack_vector':pulisci(attack_vector, "attack_vector"),
-                  'type_vuln':pulisci(type_vuln, "type_vuln")
+                  'type_vuln':pulisci(type_vuln_desc, "type_vuln")
                 })
             except Exception as e_store:
               log_exception("Thread {} - Exception on storing vulns: {}".format(str(thread_id), str(e_store)))
