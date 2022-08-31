@@ -56,3 +56,6 @@ webencodings==0.5.1
 Werkzeug==1.0.1
 pexpect
 GitPython
+pypsrp
+pypsrp[kerberos]
+pypsrp[credssp]
