@@ -24,16 +24,15 @@ RUN yum install epel-release -y && \
     yum install -y net-tools && \
     yum install -y iproute && \
     yum install -y git && \
+    yum install -y krb5-devel && \
+    yum install -y gssntlmssp && \
     yum clean all
 
 RUN wget https://nmap.org/dist/nmap-7.92.tar.bz2 && \
     bzip2 -cd nmap-7.92.tar.bz2 | tar xvf - && \
     cd nmap-7.92 && ./configure && make && make install
 
-RUN curl https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
-
 RUN mkdir /opt/nerve
-RUN mkdir /opt/profiles-inspec
 
 ADD bin $TARGET_FOLDER/bin
 ADD core $TARGET_FOLDER/core
@@ -43,6 +42,7 @@ ADD logs $TARGET_FOLDER/logs
 ADD reports $TARGET_FOLDER/reports
 ADD rules $TARGET_FOLDER/rules
 ADD static $TARGET_FOLDER/static
+ADD scripts $TARGET_FOLDER/scripts
 ADD templates $TARGET_FOLDER/templates
 ADD views $TARGET_FOLDER/views
 ADD views_api $TARGET_FOLDER/views_api

@@ -27,7 +27,9 @@ def view_inspecscan():
     username_ssh = request.values.get('username_ssh')
     password_ssh = request.values.get('password_ssh')
     profile_inspec = request.values.get('profile_inspec')
-    os_inspec = request.values.get('os_inspec')
+    os_inspec = "linux"
+    if "Windows" in profile_inspec:
+      os_inspec = "windows"
 
     if ip and username_ssh and password_ssh and profile_inspec and os_inspec:
       logger.info("Start INSPEC request..")
