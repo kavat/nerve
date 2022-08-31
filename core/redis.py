@@ -39,7 +39,7 @@ class RedisManager:
 
   def save_error(self, macro_name, func_name, message, traceback_str):
     try:
-      traceback_str_base64 = base64.b64encode(traceback_str)
+      traceback_str_base64 = base64.b64encode(traceback_str.encode('ascii')).decode('ascii')
       date_time = self.utils.get_datetime()
       key = "error_{}_{}_{}".format(macro_name, func_name, date_time)
       json_object = {

@@ -93,6 +93,8 @@
       #details{
           border-top-left-radius: 2em;
           overflow: hidden;
+          table-layout: fixed;
+	  width: 100%;
       }
 
       #details th {
@@ -192,7 +194,7 @@
   {% for key, value in json_data.vulns.items() %}
   {% if value.color != 0 %}
   <tr>
-      <th class='sev_{{value.color}}'>CONTROL</th>
+      <th style="width:15%" class='sev_{{value.color}}'>CONTROL</th>
       <th class='sev_{{value.color}}'>{{value.profile}} - {{value.control_title}}</th>
   </tr>
   <tr>
