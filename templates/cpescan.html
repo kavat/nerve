@@ -39,27 +39,25 @@
                               <div class="card-body">
                                 <p class="card-title">This is the function for CVEs analysis starting from local packages list.</p>
                                 <p>All you need to do is define host IP, SSH username/password and click <span style="font-weight:bold">GO!</span></p>
-                                  <div class="form-group row">
-                                    <label class="col-sm-2">Host data</label>
-                                    <div class="col-sm-10">
-                                        <form method="POST" action="/cvescan" class="form-inline" accept-charset="utf-8">
-                                          <div class="form-group">
-                                              <label for="username" class="sr-only">Ip</label>
-                                              <input type="text" style="width: 200px;" size="30" name="ip" placeholder="X.X.X.X" class="form-control">
-                                              <input type="text" style="width: 200px;" size="30" name="username_ssh" placeholder="username" class="form-control">
-                                              <input type="password" style="width: 200px;" size="30" name="password_ssh" placeholder="password" class="form-control">
-                                              <select name="package_type" class="form-control">
-                                                  <option value="rpm">RPM</option>
-                                                  <option value="deb">DEB</option>
-                                              </select>
-                                          </div>
-                                          <div class="form-group">
-                                              <button type="submit" class="btn btn-success">GO!</button>
-                                          </div>
-                                      </form>
-                                      <div>
-                                    </div>
-                                    </div>
+                                <div class="form-group row">
+                                  <label class="col-sm-2">Host data</label>
+                                  <div class="col-sm-10">
+                                    <form method="POST" action="/cvescan" class="form-inline" accept-charset="utf-8">
+                                      <div class="form-group">
+                                        <label for="username" class="sr-only">Ip</label>
+                                        <input type="text" style="width: 200px;" size="30" name="ip" placeholder="X.X.X.X" class="form-control">
+                                        <input type="text" style="width: 200px;" size="30" name="username_ssh" placeholder="username" class="form-control">
+                                        <input type="password" style="width: 200px;" size="30" name="password_ssh" placeholder="password" class="form-control">
+                                        <select name="package_type" class="form-control">
+                                          <option value="rpm">RPM</option>
+                                          <option value="deb">DEB</option>
+                                        </select>
+                                      </div>
+                                      <div class="form-group">
+                                        <button type="submit" class="btn btn-success">GO!</button>
+                                      </div>
+                                    </form>
+                                  </div>
                                 </div>
                               </div>
                           </div>
@@ -82,8 +80,6 @@
                                               <button type="submit" class="btn btn-success">GO!</button>
                                           </div>
                                       </form>
-                                      <div>
-                                    </div>
                                     </div>
                                 </div>
                               </div>

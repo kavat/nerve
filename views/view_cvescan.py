@@ -46,7 +46,7 @@ def view_cvescanfromfile():
       else:
         flash(msg, 'error')
     except Exception as e:
-      flash(str(e), 'error')
+      flash("Error saving file with packages list: {}".format(str(e)), 'error')
 
   return render_template('cpescan.html')
 

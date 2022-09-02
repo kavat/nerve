@@ -35,39 +35,70 @@
                     <div class="row">
                       <div class="col-md-12">
                           <div class="card">
-                              <div class="card-header">Inspec scanner DevSec Windows Baseline</div>
-                              <div class="card-body">
-                                  <p class="card-title">This is the function for Inspec analysis based on a set of profiles.</p>
-                                  <p>All you need to do is define host IP, WinRM username/password, the desired profile and click <span style="font-weight:bold">GO!</span></p>
-                                  <div class="form-group row">
-                                    <label class="col-sm-2">Host data</label>
-                                    <div class="col-sm-10">
-                                        <form method="POST" action="/inspecscan" class="form-inline" accept-charset="utf-8">
-                                          <div class="form-group">
-                                              <label for="username" class="sr-only">Ip</label>
-                                              <input type="text" style="width: 200px;" size="30" name="ip" placeholder="X.X.X.X" class="form-control">
-                                              <input type="text" style="width: 200px;" size="30" name="username_ssh" placeholder="username" class="form-control">
-                                              <input type="password" style="width: 200px;" size="30" name="password_ssh" placeholder="password" class="form-control">
-                                              <select name="profile_inspec" class="form-control">
-                                                  <option value=""></option>
-                                                  <option value="dev-sec/linux-baseline">Baseline Linux</option>
-                                                  <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
-                                                  <option value="dev-sec/windows-baseline">Baseline Windows</option>
-                                                  <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
-                                                  <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
-                                                  <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
-                                                  <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
-                                              </select>
-                                          </div>
-                                          <div class="form-group">
-                                              <button type="submit" class="btn btn-success">GO!</button>
-                                          </div>
-                                      </form>
-                                      <div>
+                            <div class="card-header">Compliance Profile for direct host execution</div>
+                            <div class="card-body">
+                              <p class="card-title">This is the function for Inspec analysis based on a set of profiles.</p>
+                              <p>All you need to do is define host IP, WinRM username/password, the desired profile and click <span style="font-weight:bold">GO!</span></p>
+                              <div class="form-group row">
+                                <label class="col-sm-2">Host data</label>
+                                <div class="col-sm-10">
+                                  <form method="POST" action="/inspecscan" class="form-inline" accept-charset="utf-8">
+                                    <div class="form-group">
+                                      <input type="text" style="width: 200px;" size="30" name="ip" placeholder="X.X.X.X" class="form-control">
+                                      <input type="text" style="width: 200px;" size="30" name="username_ssh" placeholder="username" class="form-control">
+                                      <input type="password" style="width: 200px;" size="30" name="password_ssh" placeholder="password" class="form-control">
+                                      <select name="profile_inspec" class="form-control">
+                                        <option value=""></option>
+                                        <option value="dev-sec/linux-baseline">Baseline Linux</option>
+                                        <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
+                                        <option value="dev-sec/windows-baseline">Baseline Windows</option>
+                                        <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
+                                        <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
+                                        <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
+                                        <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
+                                      </select>
                                     </div>
+                                    <div class="form-group">
+                                      <button type="submit" class="btn btn-success">GO!</button>
                                     </div>
+                                  </form>
                                 </div>
                               </div>
+                            </div>
+                          </div>
+                          <br>
+                          <div class="card">
+                            <div class="card-header">Compliance Profile for container execution</div>
+                            <div class="card-body">
+                              <p class="card-title">This is the function for Inspec analysis based on a set of profiles.</p>
+                              <p>All you need to do is define namespace, pod, container, the desired profile, upload the kube config file and click <span style="font-weight:bold">GO!</span></p>
+                              <div class="form-group row">
+                                <label class="col-sm-2">K8S data</label>
+                                <div class="col-sm-10">
+                                  <form action="/inspecscank8s" method="POST" enctype="multipart/form-data" class="form-inline" accept-charset="utf-8">
+                                    <div class="form-group">
+                                      <input type="text" style="width: 200px;" size="50" name="namespace" placeholder="namespace" class="form-control">
+                                      <input type="text" style="width: 200px;" size="50" name="pod" placeholder="pod" class="form-control">
+                                      <input type="text" style="width: 200px;" size="50" name="container" placeholder="container" class="form-control">
+                                      <input type="file" style="width: 200px;" size="50" name="kubeconfig_file" placeholder="kube config file" class="form-control">
+                                      <select name="profile_inspec" class="form-control">
+                                        <option value=""></option>
+                                        <option value="dev-sec/linux-baseline">Baseline Linux</option>
+                                        <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
+                                        <option value="dev-sec/windows-baseline">Baseline Windows</option>
+                                        <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
+                                        <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
+                                        <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
+                                        <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
+                                      </select>
+                                    </div>
+                                    <div class="form-group">
+                                      <button type="submit" class="btn btn-success">GO!</button>
+                                    </div>
+                                  </form>
+                                </div>
+                              </div>
+                            </div>
                           </div>
                       </div>
                     </div>

@@ -56,3 +56,52 @@ def view_inspecscan():
         flash(msg, 'error')
 
   return render_template('inspecscan.html')
+
+@inspecscan.route('/inspecscank8s', methods=['GET','POST'])
+@session_required
+def view_inspecscan_k8s():
+  if request.method == 'POST':
+    register = Register()
+    namespace = request.values.get('namespace')
+    pod = request.values.get('pod')
+    container = request.values.get('container')
+    profile_inspec = request.values.get('profile_inspec')
+    os_inspec = "kubernetes"
+    
+    kubeconfig_file = ""
+    try:
+      f = request.files['kubeconfig_file']
+      kubeconfig_file = "{}/{}".format(config.UPLOAD_FOLDER,f.filename)
+      f.save(kubeconfig_file)
+    except Exception as e:
+      flash("Error saving Kube config file: {}".format(str(e)), 'error')
+      return render_template('inspecscan.html')
+    
+    if namespace and pod and container and kubeconfig_file and profile_inspec and os_inspec:
+      logger.info("Start INSPEC request..")
+      scan = copy.deepcopy(config.DEFAULT_SCAN)
+      scan['type'] = 'inspec'
+      scan['namespace'] = namespace
+      scan['pod'] = pod
+      scan['container'] = container
+      scan['kubeconfig_file'] = kubeconfig_file
+      scan['profile_inspec'] = profile_inspec
+      scan['os_inspec'] = os_inspec
+      scan['targets']['networks'].append('1.1.1.1')
+
+      schema = SchemaParser(scan, request)
+      vfd, msg, scan = schema.verify()
+
+      if vfd:
+        res, code, msg = register.scan(scan)
+        if res:
+          logger.info('A INSPEC scan was initiated')
+          flash('INSPEC scan started.', 'success')
+        else:
+          flash(msg, 'error')
+
+      else:
+        flash(msg, 'error')
+
+  return render_template('inspecscan.html')
+

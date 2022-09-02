@@ -293,6 +293,18 @@ class ConfParser:
   def get_file_uploaded_config(self):
     return self.values['file_uploaded']
 
+  def get_namespace_config(self):
+    return self.values['namespace']
+
+  def get_pod_config(self):
+    return self.values['pod']
+
+  def get_container_config(self):
+    return self.values['container']
+
+  def get_kubeconfig_file_config(self):
+    return self.values['kubeconfig_file']
+
   def get_username_ssh_config(self):
     return self.values['username_ssh']
 
