@@ -85,6 +85,7 @@ def view_inspecscan_k8s():
       scan['pod'] = pod
       scan['container'] = container
       scan['kubeconfig_file'] = kubeconfig_file
+      scan['kubeconfig_name'] = f.filename
       scan['profile_inspec'] = profile_inspec
       scan['os_inspec'] = os_inspec
       scan['targets']['networks'].append('1.1.1.1')

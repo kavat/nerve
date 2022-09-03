@@ -305,6 +305,9 @@ class ConfParser:
   def get_kubeconfig_file_config(self):
     return self.values['kubeconfig_file']
 
+  def get_kubeconfig_name_config(self):
+    return self.values['kubeconfig_name']
+
   def get_username_ssh_config(self):
     return self.values['username_ssh']
 
