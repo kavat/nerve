@@ -50,13 +50,14 @@ def inspec_scanner():
         password_ssh = c.get_password_ssh_config()
 
       profile_inspec = c.get_profile_inspec_config()
+      optionals = c.get_optionals_inspec_config()
 
       logger.info("INSPECT - Hosts to scan: " + str(ip))
 
       if os_inspec != "kubernetes" and ip != "" and username_ssh != "" and password_ssh != "" and profile_inspec != "" and os_inspec != "":
         logger.info("INSPEC HOST - Send request..")
         try:
-          get_inspec_analysis("INSPEC", username_ssh, password_ssh, list(ip.keys())[0], profile_inspec, os_inspec)
+          get_inspec_analysis("INSPEC", username_ssh, password_ssh, list(ip.keys())[0], profile_inspec, os_inspec, optionals)
         except Exception as e_get:
           log_exception("INSPEC - Exception: {}".format(str(e_get)))
           rds.save_error("INSPEC", 'inspec_scanner', "Exception: {}".format(str(e_get)), str(traceback.format_exc()))
@@ -64,7 +65,7 @@ def inspec_scanner():
         if os_inspec == "kubernetes" and namespace and pod and container and kubeconfig_file and kubeconfig_name and profile_inspec != "" and os_inspec != "":
           logger.info("INSPEC K8S - Send request..")
           try:
-            get_inspec_analysis_k8s("INSPEC", namespace, pod, container, kubeconfig_file, kubeconfig_name, profile_inspec, os_inspec)
+            get_inspec_analysis_k8s("INSPEC", namespace, pod, container, kubeconfig_file, kubeconfig_name, profile_inspec, os_inspec, optionals)
           except Exception as e_get:
             log_exception("INSPEC K8S - Exception: {}".format(str(e_get)))
             rds.save_error("INSPEC", 'inspec_scanner', "Exception: {}".format(str(e_get)), str(traceback.format_exc()))

@@ -317,6 +317,9 @@ class ConfParser:
   def get_profile_inspec_config(self):
     return self.values['profile_inspec']
 
+  def get_optionals_inspec_config(self):
+    return self.values['optionals']
+
   def get_os_inspec_config(self):
     return self.values['os_inspec']
 
