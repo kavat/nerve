@@ -44,22 +44,37 @@
                                 <div class="col-sm-10">
                                   <form method="POST" action="/inspecscan" class="form-inline" accept-charset="utf-8">
                                     <div class="form-group">
-                                      <input type="text" style="width: 200px;" size="30" name="ip" placeholder="X.X.X.X" class="form-control">
-                                      <input type="text" style="width: 200px;" size="30" name="username_ssh" placeholder="username" class="form-control">
-                                      <input type="password" style="width: 200px;" size="30" name="password_ssh" placeholder="password" class="form-control">
-                                      <select name="profile_inspec" class="form-control">
-                                        <option value=""></option>
-                                        <option value="dev-sec/linux-baseline">Baseline Linux</option>
-                                        <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
-                                        <option value="dev-sec/windows-baseline">Baseline Windows</option>
-                                        <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
-                                        <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
-                                        <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
-                                        <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
-                                      </select>
-                                    </div>
-                                    <div class="form-group">
-                                      <button type="submit" class="btn btn-success">GO!</button>
+                                      <table>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Host ip</td>
+                                          <td><input type="text" style="width: 200px;" size="30" name="ip" placeholder="X.X.X.X" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Username</td>
+                                          <td><input type="text" style="width: 200px;" size="30" name="username_ssh" placeholder="username" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Password</td>
+                                          <td><input type="password" style="width: 200px;" size="30" name="password_ssh" placeholder="password" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Profile to execute</td>
+                                          <td><select name="profile_inspec" class="form-control">
+                                              <option value=""></option>
+                                              <option value="dev-sec/linux-baseline">Baseline Linux</option>
+                                              <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
+                                              <option value="dev-sec/windows-baseline">Baseline Windows</option>
+                                              <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
+                                              <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
+                                              <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
+                                              <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
+                                            </select>
+                                          </td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td colspan=2><button type="submit" class="btn btn-success">GO!</button></td>
+                                        </tr>
+                                      </table>
                                     </div>
                                   </form>
                                 </div>
@@ -77,23 +92,44 @@
                                 <div class="col-sm-10">
                                   <form action="/inspecscank8s" method="POST" enctype="multipart/form-data" class="form-inline" accept-charset="utf-8">
                                     <div class="form-group">
-                                      <input type="text" style="width: 200px;" size="50" name="namespace" placeholder="namespace" class="form-control">
-                                      <input type="text" style="width: 200px;" size="50" name="pod" placeholder="pod" class="form-control">
-                                      <input type="text" style="width: 200px;" size="50" name="container" placeholder="container" class="form-control">
-                                      <input type="file" style="width: 200px;" size="50" name="kubeconfig_file" placeholder="kube config file" class="form-control">
-                                      <select name="profile_inspec" class="form-control">
-                                        <option value=""></option>
-                                        <option value="dev-sec/linux-baseline">Baseline Linux</option>
-                                        <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
-                                        <option value="dev-sec/windows-baseline">Baseline Windows</option>
-                                        <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
-                                        <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
-                                        <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
-                                        <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
-                                      </select>
-                                    </div>
-                                    <div class="form-group">
-                                      <button type="submit" class="btn btn-success">GO!</button>
+                                      <table>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Namespace</td>
+                                          <td><input type="text" style="width: 200px;" size="50" name="namespace" placeholder="namespace" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Pod</td>
+                                          <td><input type="text" style="width: 200px;" size="50" name="pod" placeholder="pod" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Container</td>
+                                          <td><input type="text" style="width: 200px;" size="50" name="container" placeholder="container" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Kube Config file</td>
+                                          <td><input type="file" style="width: 200px;" size="50" name="kubeconfig_file" placeholder="kube config file" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Optional Inputs</td>
+                                          <td><input type="text" style="width: 500px;" size="500" name="optionals" placeholder="optional inputs for profile" class="form-control"></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td style="padding-right: 30px;">Profile to execute</td>
+                                          <td><select name="profile_inspec" class="form-control">
+                                            <option value=""></option>
+                                            <option value="dev-sec/linux-baseline">Baseline Linux</option>
+                                            <option value="dev-sec/mysql-baseline">Baseline Mysql</option>
+                                            <option value="dev-sec/windows-baseline">Baseline Windows</option>
+                                            <option value="dev-sec/cis-docker-benchmark">CIS Docker</option>
+                                            <option value="dev-sec/cis-kubernetes-benchmark">CIS Kubernetes</option>
+                                            <option value="dev-sec/cis-dil-benchmark">CIS Linux</option>
+                                            <option value="mitre/mongodb-enterprise-advanced-3-stig-baseline">MITRE MongoDB</option>
+                                          </select></td>
+                                        </tr>
+                                        <tr align="left">
+                                          <td colspan=2><button type="submit" class="btn btn-success">GO!</button></td>
+                                        </tr>
+                                      </table>
                                     </div>
                                   </form>
                                 </div>
