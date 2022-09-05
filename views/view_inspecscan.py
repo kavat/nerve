@@ -27,6 +27,7 @@ def view_inspecscan():
     username_ssh = request.values.get('username_ssh')
     password_ssh = request.values.get('password_ssh')
     profile_inspec = request.values.get('profile_inspec')
+    optionals = request.values.get('optionals')
     os_inspec = "linux"
     if "Windows" in profile_inspec:
       os_inspec = "windows"
@@ -39,6 +40,7 @@ def view_inspecscan():
       scan['password_ssh'] = password_ssh
       scan['profile_inspec'] = profile_inspec 
       scan['os_inspec'] = os_inspec 
+      scan['optionals'] = optionals
       scan['targets']['networks'].append(ip)
 
       schema = SchemaParser(scan, request)
@@ -66,6 +68,7 @@ def view_inspecscan_k8s():
     pod = request.values.get('pod')
     container = request.values.get('container')
     profile_inspec = request.values.get('profile_inspec')
+    optionals = request.values.get('optionals')
     os_inspec = "kubernetes"
     
     kubeconfig_file = ""
@@ -88,6 +91,7 @@ def view_inspecscan_k8s():
       scan['kubeconfig_name'] = f.filename
       scan['profile_inspec'] = profile_inspec
       scan['os_inspec'] = os_inspec
+      scan['optionals'] = optionals 
       scan['targets']['networks'].append('1.1.1.1')
 
       schema = SchemaParser(scan, request)
