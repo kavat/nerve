@@ -12,6 +12,7 @@ echo "Start redis.."
 redis-server --bind 127.0.0.1 2>&1> /var/log/redis.log &
 
 echo "Start NERVE.."
+export LANG="en_US.UTF-8"
 /usr/bin/python3 main.py
 tail -f /dev/null
 
