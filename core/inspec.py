@@ -6,6 +6,7 @@ import shutil
 import json
 import traceback
 import base64
+import re
 
 from git          import Repo
 from pathlib      import Path
@@ -33,6 +34,7 @@ def get_inspec_analysis(thread_id, username, password, host, profile, os, option
         try:
           row["host"] = host
           row["profile"] = profile 
+          row["control_id_numeric"] = re.sub("^[^0-9]+", "", row["control_id"])
           rds.store_inspec(row)
         except Exception as e_redis:
           log_exception("Thread {} - Redis error: {}".format(thread_id, str(e_redis)))
@@ -66,13 +68,14 @@ def get_inspec_analysis_k8s(thread_id, namespace, pod, container, kubeconfig_fil
         try:
           row["host"] = "{}/{}".format(pod, container)
           row["profile"] = profile
+          row["control_id_numeric"] = re.sub("^[^0-9]+", "", row["control_id"])
           rds.store_inspec(row)
         except Exception as e_redis:
           log_exception("Thread {} - Redis error: {}".format(thread_id, str(e_redis)))
-          rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Redis error: {}".format(thread_id, str(e_redis)), str(traceback.format_exc()))
+          rds.save_error("INSPEC THREAD", "get_inspec_analysis_k8s", "Thread {} - Redis error: {}".format(thread_id, str(e_redis)), str(traceback.format_exc()))
     else:
       logger.error("Thread {} - Status not 200")
-      rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Status not 200", '')
+      rds.save_error("INSPEC THREAD", "get_inspec_analysis_k8s", "Thread {} - Status not 200", '')
   except Exception as e:
     log_exception("Thread {} - Exception main: {}".format(thread_id, str(e)))
-    rds.save_error("INSPEC THREAD", "get_inspec_analysis", "Thread {} - Exception main: {}".format(thread_id, str(e)), str(traceback.format_exc()))
+    rds.save_error("INSPEC THREAD", "get_inspec_analysis_k8s", "Thread {} - Exception main: {}".format(thread_id, str(e)), str(traceback.format_exc()))

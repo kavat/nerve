@@ -6,6 +6,7 @@ from core.logging import logger
 from core.redis import rds
 from core.utils import Utils
 from version import VERSION
+from packaging import version
 
 utils = Utils()
 
@@ -97,7 +98,7 @@ def generate_html_inspec(vulns, head, conf):
   for k, v in vulns.items():
     vuln_count[v['result_status']] += 1
 
-  sorted_vulns = {k: v for k, v in sorted(vulns.items(), key=lambda item: item[1]['control_id'], reverse=True)}
+  sorted_vulns = {k: v for k, v in sorted(vulns.items(), key=lambda item: version.parse(item[1]['control_id_numeric']), reverse=False)}
 
   body = {
         'head': head,
