@@ -11,4 +11,4 @@ data = {k: v for k, v in sorted(data.items(),
 
 print("HOST;PROFILE;ID;CONTROL TITLE;CONTROL DESCRIPTION;TEST DESCRIPTION;RESULT")
 for key, value in data.items():
-  print("{};{};{};{};{};{}".format(value['host'],value['profile'],value['control_id_numeric'],value['control_title'].replace("\n",""),value['control_desc'].replace("\n",""),value['result_desc'].replace("\n",""),value['result_status']))
+  print("{};{};{};{};{};{};{}".format(value['host'],value['profile'],value['control_id_numeric'],value['control_title'].replace("\n",""),value['control_desc'].replace("\n",""),value['result_desc'].replace("\n",""),value['result_status']))

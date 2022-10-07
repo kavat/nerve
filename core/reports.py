@@ -59,7 +59,7 @@ def generate_html(vulns, head, conf):
   
   return filename
 
-def generate_html_cve(vulns, head, conf):
+def generate_html_cve(vulns, vulnsnotfound, head, conf):
   vuln_count = {0:0, 1:0, 2:0, 3:0, 4:0}
   filename = 'report-{}-{}.html'.format(utils.generate_uuid(), utils.get_date())
   templateLoader = jinja2.FileSystemLoader(searchpath="./templates/")
@@ -71,11 +71,13 @@ def generate_html_cve(vulns, head, conf):
     vuln_count[v['rule_sev']] += 1
  
   sorted_vulns = {k: v for k, v in sorted(vulns.items(), key=lambda item: item[1]['rule_sev'], reverse=True)}
+  sorted_vulnsnotfound = {k: v for k, v in sorted(vulnsnotfound.items(), key=lambda item: item[1]['product_name'])}
  
   body = {
         'head': head,
         'conf': conf,
         'vulns': sorted_vulns,
+        'vulnsnotfound': sorted_vulnsnotfound,
         'vuln_count':vuln_count,
         'version':VERSION,
   }

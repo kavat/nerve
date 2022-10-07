@@ -40,6 +40,7 @@ def view_download(file):
     data = rds.get_vuln_data()
     data_network = rds.get_vuln_data()
     data_cve = rds.get_cve_data()
+    data_cvenotfound = rds.get_cvenotfound_data()
     data_inspec = rds.get_inspec_data()
     conf = rds.get_scan_config()
     head_network = rds.get_last_scan_info('network')    
@@ -60,7 +61,7 @@ def view_download(file):
                                       cache_timeout=0)
       return response
     elif file == 'report_html_cve':
-      report_file = generate_html_cve(data_cve, head_cve, conf)
+      report_file = generate_html_cve(data_cve, data_cvenotfound, head_cve, conf)
       response = send_from_directory(directory='reports',
                                       filename=report_file,
                                       as_attachment=True,

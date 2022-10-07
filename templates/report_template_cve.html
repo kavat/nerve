@@ -245,6 +245,25 @@
   {% endfor %}
   {% endif %}
 
+  {% if json_data.vulnsnotfound %}
+  {% for key, value in json_data.vulnsnotfound.items() %}
+  <tr>
+      <th class='sev_{{value.rule_sev}}'>SOFTWARE</th>
+      <th class='sev_{{value.rule_sev}}'>{{value.product_name}} v{{value.product_version}}</th>
+  </tr>
+  <tr>
+      <th class='sev_{{value.rule_sev}}'>TYPE OF VULNERABILITY</th>
+      <td>{{value.type_vuln}}</td>
+  </tr>
+  <tr>
+      <th class='sev_{{value.rule_sev}}'>FINDINGS</th>
+      <td>NO-ONE</td>
+  </tr>
+  <tr>
+      <td colspan="2" style="background-color: #13869A; padding-left: 3px; line-height: 3px; overflow: hidden;"></td>
+  </tr>
+  {% endfor %}
+  {% endif %}
 
 </table>
 

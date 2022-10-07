@@ -115,7 +115,19 @@ class RedisManager:
     logger.info('Vulnerability detected')
     
     self.store_json(key_hash, value)
-  
+ 
+  def store_cpe_nocve(self, value):
+    key = '{}{}'.format(value['ip'], value['cpe'])
+    key_hash = 'cvenotfound_' + self.utils.hash_sha1(key)
+
+    if self.r.exists(key_hash):
+      self.r.delete(key_hash)
+      #return False
+
+    logger.info('CVE NOT FOUND detected')
+
+    self.store_json(key_hash, value)
+ 
   def store_cve(self, value):
     key = '{}{}{}{}'.format(value['ip'], value['cve_id'],
                             value['cpe'], value['rule_details'])
@@ -223,6 +235,19 @@ class RedisManager:
   def get_cve_data(self):
     kv = {}
     for ip_key in self.r.scan_iter(match="cve_*"):
+      data = self.r.get(ip_key)
+      if data:
+        try:
+          result = pickle.loads(data)
+          kv[ip_key.decode('utf-8')] = result
+        except:
+          logger.error('Error retrieving key')
+
+    return kv
+
+  def get_cvenotfound_data(self):
+    kv = {}
+    for ip_key in self.r.scan_iter(match="cvenotfound_*"):
       data = self.r.get(ip_key)
       if data:
         try:
@@ -358,7 +383,7 @@ class RedisManager:
   def backup_data(self):
     try:
       stringa_backup = ""
-      for prefix in ('vuln', 'cve', 'inspec'):
+      for prefix in ('vuln', 'cve', 'cvenotfound', 'inspec'):
         for key in self.r.scan_iter(match="{}_*".format(prefix)):
           contenuto = base64.b64encode(self.r.get(key)).decode('utf-8')
           stringa_backup = "{}{}__||__{}\n".format(stringa_backup, key.decode('utf-8'), contenuto)
@@ -371,7 +396,7 @@ class RedisManager:
       return False 
 
   def clear_session_orig(self):
-    for prefix in ('vuln', 'sca', 'sch', 'inv', 'cve', 'inspec'):
+    for prefix in ('vuln', 'sca', 'sch', 'inv', 'cve', 'cvenotfound', 'inspec'):
       for key in self.r.scan_iter(match="{}_*".format(prefix)):
         self.r.delete(key)
       
@@ -389,7 +414,7 @@ class RedisManager:
       self.r.delete('last_scan_network')
       for i in ('vuln', 'sca', 'sch', 'inv'):
         self.clear_data_prefix(i)
-    if prefix == 'cve' or prefix == 'inspec':
+    if prefix == 'cve' or prefix == 'cvenotfound' or prefix == 'inspec':
       self.r.delete("last_scan_{}".format(prefix))
     for key in self.r.scan_iter(match="{}_*".format(prefix)):
       self.r.delete(key)
