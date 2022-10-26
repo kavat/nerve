@@ -1,0 +1,78 @@
+FROM --platform=linux/arm64/v8 ubuntu:22.04
+
+ARG DEBIAN_FRONTEND=noninteractive
+ARG TARGET_FOLDER=/opt/nerve
+
+RUN apt update && \
+    apt install -y gcc && \
+    apt install -y redis && \
+    apt install -y python3 && \
+    apt install -y python3-pip && \
+    apt install -y python3-dev && \
+    apt install -y wget && \
+    apt install -y bzip2 && \
+    apt install -y make && \
+    apt install -y vim && \
+    apt install -y g++ && \
+    apt install -y at && \
+    apt install -y sudo && \
+    apt install -y postgresql-contrib && \
+    apt install -y libffi-dev && \
+    apt install -y libssl-dev && \
+    apt install -y build-essential && \ 
+    apt install -y libjpeg-turbo8-dev && \
+    apt install -y curl && \
+    apt install -y unzip && \
+    apt install -y jq && \
+    apt install -y openssh-server && \
+    apt install -y net-tools && \
+    apt install -y iproute2 && \
+    apt install -y git && \
+    apt install -y libpq-dev && \
+    apt install -y libkrb5-dev && \
+    apt install -y gss-ntlmssp
+
+RUN wget https://nmap.org/dist/nmap-7.92.tar.bz2 && \
+    bzip2 -cd nmap-7.92.tar.bz2 | tar xvf - && \
+    cd nmap-7.92 && ./configure && make && make install
+
+RUN useradd -m metasploit && \
+    curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb | bash
+
+USER metasploit
+RUN echo "no" | msfdb init
+
+USER root
+RUN mkdir /opt/nerve
+
+ADD bin $TARGET_FOLDER/bin
+ADD core $TARGET_FOLDER/core
+ADD db $TARGET_FOLDER/db
+ADD install $TARGET_FOLDER/install
+ADD logs $TARGET_FOLDER/logs
+ADD reports $TARGET_FOLDER/reports
+ADD rules $TARGET_FOLDER/rules
+ADD static $TARGET_FOLDER/static
+ADD scripts $TARGET_FOLDER/scripts
+ADD templates $TARGET_FOLDER/templates
+ADD views $TARGET_FOLDER/views
+ADD views_api $TARGET_FOLDER/views_api
+
+COPY config.py $TARGET_FOLDER
+COPY main.py $TARGET_FOLDER
+COPY requirements.txt $TARGET_FOLDER
+COPY start.sh $TARGET_FOLDER
+COPY version.py $TARGET_FOLDER
+COPY export_inspec.py $TARGET_FOLDER
+COPY update_metasploit.sh $TARGET_FOLDER
+
+WORKDIR $TARGET_FOLDER/
+
+RUN pip3 install --user -r requirements.txt
+RUN chmod 755 main.py
+RUN chmod 755 start.sh
+RUN chmod 755 update_metasploit.sh
+ENTRYPOINT ["/opt/nerve/start.sh"]
+
+EXPOSE 8080/tcp
+

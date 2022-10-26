@@ -29,12 +29,13 @@ def inspec_scanner():
         continue
 
       c = ConfParser(conf)
-      logger.info("INSPEC - Scan configuration: " + str(conf))
 
       if c.get_type_config() != 'inspec':
         logger.info("INSPEC - Not a scan with INSPEC request..")
         time.sleep(10)
         continue
+
+      logger.debug("INSPEC - Scan configuration: " + str(conf))
 
       os_inspec = c.get_os_inspec_config()
       ip = rds.get_ips_to_scan(limit = c.get_cfg_scan_threads())

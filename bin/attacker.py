@@ -17,13 +17,13 @@ def run_rules(conf):
     rules = rule_manager(role='attacker')
     if 'ports' in values and len(values['ports']) > 0:  
       for port in values['ports']:
-        logger.info('Attacking Asset: {} on port: {}'.format(ip, port))
+        logger.info('ATTACKER - Attacking Asset: {} on port: {}'.format(ip, port))
         for rule in rules.values():
           """
             Check if the target is in exclusions list, if it is, skip.
           """
           if rule.rule in exclusions and ip in exclusions[rule.rule]:
-            logger.debug('Skipping rule {} for target {}'.format(rule.rule, ip))
+            logger.debug('ATTACKER - Skipping rule {} for target {}'.format(rule.rule, ip))
             continue
 
           """
@@ -35,7 +35,7 @@ def run_rules(conf):
 
 def attacker():
   count = 0
-  logger.info('Attacker process started')
+  logger.info('ATTACKER - Attacker process started')
   
   while True:
     conf = rds.get_scan_config()
@@ -52,6 +52,6 @@ def attacker():
       count = 0
     
       if threading.active_count() > 50:
-        logger.debug('Sleeping for 30 seconds to control threads (Threads: {})'.format(threading.active_count()))  
+        logger.debug('ATTACKER - Sleeping for 30 seconds to control threads (Threads: {})'.format(threading.active_count()))  
         time.sleep(30)
     

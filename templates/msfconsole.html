@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>NERVE</title>
+    <link rel="shortcut icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link href={{ url_for('static', filename="vendor/bootstrap4/css/bootstrap.min.css") }}  rel="stylesheet">
+    <link href={{ url_for('static', filename="vendor/toastr/toastr.min.css") }}  rel="stylesheet">
+    <link href={{ url_for('static', filename="css/nerve.css") }}?{{value_random}}  rel="stylesheet">
+    <link href={{ url_for('static', filename="css/master.css") }}  rel="stylesheet">
+</head>
+
+<body>
+    <div class="wrapper">
+        <div id="sidebar">{% include 'sidebar.html' %}</div>
+            <div id="body">
+                <nav class="navbar navbar-expand-lg navbar-primary bg-primary">
+                    <button type="button" id="sidebarCollapse" class="btn btn-outline-light default-light-menu"><i class="fas fa-bars"></i><span></span></button>
+                    <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                        <ul class="nav navbar-nav ml-auto">
+                          {% include 'headbar.html' %}
+                        </ul>
+                    </div>
+                </nav>
+
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="page-title">
+                        <h3>Metasploit</h3>
+                    </div>
+                    <div class="row">
+                      <div class="col-md-12">
+                          <div class="card">
+                              <div class="card-header">Msfconsole</div>
+                              <div class="card-body">
+                                  <p class="card-title"><b>This console will start populating once data comes in...</b></p>
+                                  <i class="fa fa-spinner fa-spin"></i> <small>Msfconsole is streaming...</small>
+                                  <pre class="bash" id="output"></pre>
+                                  <input type="text" id="command" style="width: 500px; float: left;" /> 
+				  <i class="fa fa-spinner fa-spin" id="commandWait" style="display: none;"></i>
+                              </div>
+                          </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src={{ url_for('static', filename="/vendor/jquery3/jquery-3.4.1.min.js") }}></script>
+    <script src={{ url_for('static', filename="/vendor/bootstrap4/js/bootstrap.bundle.min.js") }}></script>
+    <script src={{ url_for('static', filename="/vendor/fontawesome5/js/solid.min.js") }}></script>
+    <script src={{ url_for('static', filename="/vendor/fontawesome5/js/fontawesome.min.js") }}></script>
+    <script src={{ url_for('static', filename="/vendor/toastr/toastr.min.js") }}></script>
+    <script src={{ url_for('static', filename="/js/script.js") }}></script>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+       <script>
+       {% for category, message in messages %}
+       toastr.{{category}}("{{ message }}");
+       {% endfor %}
+       </script>
+    {% endif %}
+   {% endwith %}
+
+    <script>
+
+      var output = document.getElementById('output');
+      var xhr = new XMLHttpRequest();
+      xhr.open('GET', '/msfconsole_stream');
+      xhr.send();
+
+      setInterval(function() {
+        output.textContent = xhr.responseText;
+        $('#output').animate({scrollTop: $('#output')[0].scrollHeight}, "slow");
+        if(xhr.responseText != "") {
+          $("#commandWait").css("display", "none");
+          $("#command").removeAttr("disabled");
+        }
+      }, 1000);
+
+    </script>
+
+    <script> 
+      $("#command").keypress(function(event) {
+        if (event.keyCode === 13) {
+          $.ajax({
+            type: 'POST',
+            url: "/msfconsole_command",
+            data: { command_line: $("#command").val() },
+            beforeSend: function() {
+              $("#commandWait").css("display", "block");
+              $("#command").attr("disabled", "disabled");
+            },
+            complete: function() {
+              $("#command").val("");
+            }
+	  })
+        }
+      });
+    </script> 
+
+</body>
+</html>

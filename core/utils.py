@@ -10,6 +10,7 @@ import psutil
 import hashlib
 import ipaddress
 import traceback
+import threading
 
 from core.logging import logger
 from config       import WEB_LOG, USER_AGENT
@@ -198,6 +199,13 @@ class Charts:
           
     return ports
 
+def check_thread(thread_name):
+  status = "red"
+  for thread in threading.enumerate():
+    if thread.name == thread_name:
+      status = "green"
+  return status
+
 def check_service_http(host, port, path, matrix_keys_values):
   url = "http://{}:{}/{}".format(host, port, path)
   logger.info("Launching GET request to {}".format(url))
@@ -233,3 +241,7 @@ def check_service_http(host, port, path, matrix_keys_values):
 def log_exception(message):
   logger.error("EXCEPTION: {}".format(message))
   logger.error("STACKTRACE: {}".format(str(traceback.format_exc())))
+
+def escape_ansi(line):
+  ansi_escape = re.compile(r'(?:\x1B[@-_]|[\x80-\x9F])[0-?]*[ -/]*[@-~]')
+  return ansi_escape.sub('', line)

@@ -27,12 +27,13 @@ def cve_scanner():
         continue
 
       c = ConfParser(conf)
-      logger.info("CVE_SCANNER - can configuration: " + str(conf))
 
       if c.get_type_config() != 'cve':
         logger.info("CVE_SCANNER - Not a scan with CVE request..")
         time.sleep(10)
         continue
+
+      logger.debug("CVE_SCANNER - Scan configuration: " + str(conf))
 
       cpe_list = []
       ip = rds.get_ips_to_scan(limit = c.get_cfg_scan_threads())

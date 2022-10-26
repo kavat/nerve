@@ -51,7 +51,7 @@ for protocol in tcp udp; do
 
 done
 
-for riga in $(cat /tmp/appoggio | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u); do
+for riga in $(cat /tmp/appoggio | grep "[^:]\+\:[0-9\.]\+[a-zA-Z0-9]\+" -o | sed "s/\.$//g" | sort -u); do
 
   type_vuln=$(echo $riga | awk -F';' '{print $1}')
   type_package=$(echo $riga | awk -F';' '{print $2}')
@@ -63,4 +63,4 @@ for riga in $(cat /tmp/appoggio | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" |
 
 done
 
-cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used/g" | sed "s/internal;executable/internal_executable/g"
+cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+[a-zA-Z0-9]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used/g" | sed "s/internal;executable/internal_executable/g"

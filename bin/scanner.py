@@ -15,7 +15,7 @@ def scanner():
 
     scanner = Scanner()
 
-    logger.info('Scanner process started')
+    logger.info('NETWORK_SCANNER - Process started')
 
     while True:
       if not rds.is_session_active():
@@ -29,15 +29,15 @@ def scanner():
         continue
 
       c = ConfParser(conf)
-      logger.info("Scan configuration: " + str(conf))
 
       if c.get_type_config() != 'network':
-        logger.info("Not a scan with NETWORK request..")
+        logger.info("NETWORK_SCANNER - Not a scan with NETWORK request..")
         time.sleep(10)
         continue
 
+      logger.debug("NETWORK_SCANNER - Scan configuration: " + str(conf))
       hosts = rds.get_ips_to_scan(limit = c.get_cfg_scan_threads())
-      logger.info("Hosts to scan: " + str(hosts))
+      logger.info("NETWORK_SCANNER - Hosts to scan: " + str(hosts))
 
       if hosts:
         conf = rds.get_scan_config()
@@ -48,24 +48,24 @@ def scanner():
 
         if scan_data:
           for host, values in scan_data.items():
-            logger.info('Discovered Asset: {}'.format(host))
+            logger.info('NETWORK_SCANNER - Discovered Asset: {}'.format(host))
             try:
               real_ip = c.get_real_ip_config()
             except:
               real_ip = ''
             if real_ip != '':
               host = real_ip
-            logger.info('Asset remapping: {}'.format(host))
+            logger.info('NETWORK_SCANNER - Asset remapping: {}'.format(host))
             if 'ports' in values and values['ports']:
-              logger.debug('Host: {}, Open Ports: {}'.format(host, values['ports']))
-              logger.info('Host: {}, values: {}'.format(host, values))
+              logger.debug('NETWORK_SCANNER - Host: {}, Open Ports: {}'.format(host, values['ports']))
+              logger.info('NETWORK_SCANNER - Host: {}, values: {}'.format(host, values))
               rds.store_topology(host)
               rds.store_sca(host, values)
               rds.store_inv(host, values)
             else:
-              logger.info("Ports field not present")
+              logger.info("NETWORK_SCANNER - Ports field not present")
               if values['status_reason'] == 'echo-reply':
-                logger.info('Discovered Asset: {}'.format(host))
+                logger.info('NETWORK_SCANNER - Discovered Asset: {}'.format(host))
                 rds.store_topology(host)
         else:
           logger.error('NETWORK_SCANNER - no scan_data')

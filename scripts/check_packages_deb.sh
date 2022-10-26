@@ -52,7 +52,7 @@ for protocol in tcp udp; do
 
 done
 
-cat /tmp/appoggio | sed "s/\:\(.*\)___/___/g" | sed "s/___[^\:]\+\:/___/g" | grep "\(.*\)___[0-9\.]\+" -o | sed "s/\.$//g" | sed "s/___/\:/g" | sort -u > /tmp/appoggio_as_rpm
+cat /tmp/appoggio | sed "s/\:\(.*\)___/___/g" | sed "s/___[^\:]\+\:/___/g" | grep "\(.*\)___[0-9\.]\+[a-zA-Z0-9]\+" -o | sed "s/\.$//g" | sed "s/___/\:/g" | sort -u > /tmp/appoggio_as_rpm
 
 for riga in $(cat /tmp/appoggio_as_rpm); do
 
@@ -66,4 +66,4 @@ for riga in $(cat /tmp/appoggio_as_rpm); do
 
 done
 
-cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used/g" | sed "s/internal;executable/internal_executable/g"
+cat /tmp/ritorno | grep "[^:]\+\:[0-9\.]\+[a-zA-Z0-9]\+" -o | sed "s/\.$//g" | sort -u | sed "s/external;used/external_used/g" | sed "s/external;executable/external_executable/g" | sed "s/internal;used/internal_used/g" | sed "s/internal;executable/internal_executable/g"

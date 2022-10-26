@@ -3,7 +3,10 @@ import os
 
 from core.redis   import rds
 from core.workers import start_workers
-from core.utils import check_service_http
+from core.utils import (
+  check_service_http,
+  check_thread
+)
 from version import VERSION
 from flask   import Flask
 from flask_restful  import Api
@@ -25,6 +28,7 @@ from views.view_system_mgmnt  import system_mgmnt
 from views.view_system_errors import system_errors
 from views.view_login         import login
 from views.view_console       import console
+from views.view_msfconsole    import msfconsole
 from views.view_logout        import logout
 from views.view_download      import download
 from views.view_stream        import stream
@@ -33,7 +37,6 @@ from views.view_scan          import scan
 from views.view_vulns         import vulns
 from views.view_alert         import alert
 from views.view_startover     import startover
-
 
 # Import REST API Endpoints
 from views_api.api_health import Health
@@ -52,6 +55,7 @@ app.register_blueprint(download)
 app.register_blueprint(assets)
 app.register_blueprint(stream)
 app.register_blueprint(console)
+app.register_blueprint(msfconsole)
 app.register_blueprint(documentation)
 app.register_blueprint(dashboard)
 app.register_blueprint(qs)
@@ -140,6 +144,9 @@ def show_cve_service_status():
 def show_profile_service_status():
   return dict(profile_service_status=check_service_http(rds.get_custom_config('config_profile_service_host'), str(rds.get_custom_config('config_profile_service_port')), '', {"green": "ritorno['status'] == True"}))
 
+@app.context_processor
+def show_metasploit_thread_status():
+  return dict(metasploit_thread_status=check_thread("metasploit"))
 
 if __name__ == '__main__':
   rds.initialize()

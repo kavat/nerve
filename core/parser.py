@@ -284,6 +284,9 @@ class ConfParser:
   def get_type_ie_config(self):
     return self.values['type_ie']
 
+  def get_meta_command(self):
+    return self.values['command_line']
+
   def get_real_ip_config(self):
     return self.values['real_ip']
 

@@ -84,7 +84,15 @@ class RedisManager:
     except Exception as e:
       logger.error("Unable to return {}, return default {}, exception: {}".format(str(key), str(default), str(e)))
       return default
- 
+
+  def get_metasploit_command(self):
+    key = "sess_metasploit_command"
+    ritorno = ""
+    if self.r.exists(key):
+      ritorno = self.r.get(key).decode('utf-8')
+      self.r.delete(key)
+    return ritorno
+
   def get_slack_settings(self):
     return self.r.get('p_settings_slack')
   
@@ -396,17 +404,17 @@ class RedisManager:
       return False 
 
   def clear_session_orig(self):
-    for prefix in ('vuln', 'sca', 'sch', 'inv', 'cve', 'cvenotfound', 'inspec'):
+    for prefix in ('vuln', 'sca', 'sch', 'inv', 'cve', 'cvenotfound', 'inspec', 'metasploit'):
       for key in self.r.scan_iter(match="{}_*".format(prefix)):
         self.r.delete(key)
       
-    for i in ('topology', 'config', 'state'):
+    for i in ('topology', 'config', 'state', 'metasploit'):
       self.r.delete('sess_{}'.format(i))
     
     self.utils.clear_log()
 
   def clear_session(self):
-    for i in ('config', 'state'):
+    for i in ('config', 'state', 'metasploit'):
       self.r.delete('sess_{}'.format(i))
 
   def clear_data_prefix(self, prefix):

@@ -7,7 +7,10 @@ from core.redis import rds
 from core.parser import SchemaParser
 from core.register  import Register
 from core.logging   import logger
-from core.utils import check_service_http
+from core.utils import (
+  check_service_http,
+  check_thread
+)
 
 from flask import (
   Blueprint,
