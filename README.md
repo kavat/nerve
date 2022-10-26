@@ -1,12 +1,11 @@
-# Network Exploitation, Reconnaissance & Vulnerability Engine (N.E.R.V.E)
-![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/dashboard.png)
+# Network Exploitation, Reconnaissance, Vulnerability Engine & Exploit (N.E.R.V.E & Exploit)
+![Nerv&Sploit](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/dashboard.png)
 
 # Table of Contents
 * [Continuous Security](#Continuous-Security)
-* [About NERVE](#)
-  * [What is NERVE](#about-Nerve)
+* [About NERV&SPLOIT](#)
+  * [What is NERV&SPLOIT](#about-Nerv&Sploit)
   * [How it works](#how-it-works)
-  * [Differences among version 2 and current version on this project](#Differences-among-version-2-and-current-version-on-this-project)
   * [Features](#features)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
@@ -31,13 +30,14 @@ The benefit of running security scanning continuously can be any of the followin
 * You want the ability to respond quicker.
 
 NERVE was created to address this problem. Commercial tools are great, but they are also heavy, not easily extensible, and cost money.
+Next, union with Metasploit by Rapid7 (https://github.com/rapid7/metasploit-framework) has generated new build, called NERV&SPLOIT.
 
-![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/12.png?raw=true)
+![Nerv&Sploit](https://github.com/kavat/nerve/blob/master/static/screenshots/12.png?raw=true)
 
-# About NERVE
-NERVE is a vulnerability scanner tailored to find low-hanging fruit level vulnerabilities, in specific application configurations, network services, and unpatched services.
+# About NERV&SPLOIT
+NERV&SPLOIT is a vulnerability scanner tailored to find low-hanging fruit level vulnerabilities, in specific application configurations, network services, and unpatched services.
 
-Example of some of NERVE's detection capabilities:
+Example of some of NERV&SPLOIT's detection capabilities:
 * Interesting Panels (Solr, Django, PHPMyAdmin, etc.)
 * Subdomain takeovers
 * Open Repositories
@@ -49,27 +49,27 @@ Example of some of NERVE's detection capabilities:
 * Open Caches
 * Directory Indexing
 * Best Practices
-* NMAP execution by SSH VPN tunnel (this permits internal scan in order to detect services binded on localhost, it's important to indentify services if an attacker would want stealth persistency)
+* NMAP execution without or with SSH VPN tunnel (this permits internal scan in order to detect services binded on localhost, it's important to indentify services if an attacker would want stealth persistency), named external or internal network scan
 * CVE list based on packages installed list on the system (using cve-search framework forked [on my repo](https://github.com/kavat/cve-search))  
 * Profile scan using DevSec framework to verify OS hardening (using my [compliance-profile](https://github.com/kavat/compliance-profile) project)
+* Interface with Metasploit console (msfconsole)
 
 # How it works
-NERVE permits to conduce vulnerability assessment based on NMAP run, launching scanning TCP/UDP oriented and reaching informations services related
+NERV&SPLOIT permits to conduce vulnerability assessment based on NMAP run, launching scanning TCP/UDP oriented and reaching informations services related. CVE search integration, OS hardering checks and msfconsole have been added to initial features building a continuos security framework
 
-# Differences among version 2 and current version on this project
-Different from previous project, NERVE can do authenticated scans operating not in black-box mode only from version 3.
+Network scan is based on NMAP library and checks and tests open doors and analysis services related: normal scan (external) does it from outside, internal scan does it from inside and it's very important when we want to check internal perimeter in order to detect all points where an attacker could do stealth persistency.
 
-Based on NMAP library even, this feature checks and tests open doors and analysis services related: normal scans do it from outside, internal scans do it from inside, it's very importante when we want to check internal perimeter in order to detect all points where an attacker could do stealth persistency.
+To come inside host, Flask interface creates a SSH VPN tunnel between itself and destination host (automatically or manually as indicated by UI interface).
 
-To go inside of host, Flask interface creates a SSH VPN tunnel among itself and destination host (automatically or manually as indicated by UI interface).
-
-CVE search has been implemented and joined with NERVE starting from the packages installed list. CVE-Search has been forked [on my repo](https://github.com/kavat/cve-search) and this version allows to perform API call with program name and version as only parameters. This provides a full list of CVE related to the packages installed on the system.
+CVE search has been implemented and joined with NERV&SPLOUIT starting from the packages installed list. CVE-Search has been forked [on my repo](https://github.com/kavat/cve-search) and this version allows to perform API call with program name and version as only parameters. This provides a full list of CVE related to the packages installed on the system.
 
 Using inspec framework and profiles official released by DevSec as:
 * [Linux Baseline](https://github.com/dev-sec/linux-baseline)
 * [CIS Linux](https://github.com/dev-sec/cis-dil-benchmark)
 * [Windows Baseline](https://github.com/dev-sec/windows-baseline)
 new project [compliance-profile](https://github.com/kavat/compliance-profile) on my repository was born. This feature allows to perform a scan to verify OS hardening suggested by DevSec profiles.
+
+Metasploit can do all sorts of things and in this integration a web console linked to msfconsole has been realized.
 
 Reports for every type of scan is provided.
 
@@ -98,7 +98,7 @@ Internal scan, CVE search and Compliance profile in this moment don't support Wi
 Internal scan, CVE search and Compliance profile in this moment support one host for time scan (in roadmap CIDR extension)
 
 # Features
-NERVE offers the following features:
+NERV&SPLOIT offers the following features:
 * Dashboard (With a Login interface)
 * Check external services status (CVE and Compliance Profile services)
 * REST API (Scheduling assessments, Obtaining results, etc)
@@ -117,16 +117,18 @@ NERVE offers the following features:
 * Network Topology Graphs
 * CVE related to packages installed list
 * Compliance profile execution with OS hardening best practice
+* Integration with Metasploit with dedicated section in order to run msfconsole
 
 # Prerequisites
-NERVE will install all the prerequisites for you automatically if you choose the Server installation (CentOS 7.x and Ubuntu 18.x were tested) (by using `install/setup.sh` script). It also comes with a Dockerfile for your convenience.
+NERV&SPLOIT will install all the prerequisites for you automatically if you choose the Server installation (CentOS 8.x and Ubuntu 22.04 LTS were tested) (by using `install/setup.sh` script). It also comes with a Dockerfile for your convenience.
 
-Keep in mind, NERVE requires root access for the initial setup on bare metal (package installation, etc).
+Keep in mind, NERV&SPLOIT requires root access for the initial setup on bare metal (package installation, etc).
 
-Services and Packages required for NERVE to run:
+Services and Packages required for NERV&SPLOIT to run:
 * Web Server (Flask)
 * Redis server (binds locally)
 * Nmap package (binary and Python nmap library)
+* Metasploit package
 * Inbound access on HTTP/S port (you can define this in config.py)
 
 The installation script takes care of everything for you, but if you want to install it by yourself, keep in mind these are required.
@@ -145,21 +147,21 @@ PROFILE_SERVICE_HOST = "172.17.0.3"
 PROFILE_SERVICE_PORT = 5000
 ```
 
-The first two lines indicate configuration for cve-search service, second two lines indicate configuration for compliance-profile service: both services has to be reachable from NERVE running host
+The first two lines indicate configuration for cve-search service, second two lines indicate configuration for compliance-profile service: both services has to be reachable from NERV&SPLOIT running host
 
 ## Deployment Recommendation
-The best way to deploy it, is to run it against your infrastructure from multiple regions (e.g. multiple instances of NERVE, in multiple countries), and toggle continuous mode so that you can catch short-lived vulnerabilities in dynamic environments/cloud.
+The best way to deploy it, is to run it against your infrastructure from multiple regions (e.g. multiple instances of NERV&SPLOIT, in multiple countries), and toggle continuous mode so that you can catch short-lived vulnerabilities in dynamic environments/cloud.
 
-We typically recommend not to whitelist the IP addresses where NERVE will be initiating the scans from, to truly test your infrastructure from an attacker standpoint.
+We typically recommend not to whitelist the IP addresses where NERV&SPLOIT will be initiating the scans from, to truly test your infrastructure from an attacker standpoint.
 
-To make NERVE fairly lightweight, there's no use of a database other than Redis.
+To make NERV&SPLOIT fairly lightweight, there's no use of a database other than Redis.
 
-If you want to store your vulnerabilities long term, we recommend using the Web hook feature. At the end of each scan cycle, NERVE will dispatch a JSON payload to an endpoint of your choice, and you can then store it in a database for further analysis.
+If you want to store your vulnerabilities long term, we recommend using the Web hook feature. At the end of each scan cycle, NERV&SPLOIT will dispatch a JSON payload to an endpoint of your choice, and you can then store it in a database for further analysis.
 
 Here are the high level steps we recommend to get the most optimal results:
-1. Deploy NERVE on 1 or more servers.
+1. Deploy NERV&SPLOIT on 1 or more servers.
 2. Create a script that fetches your Cloud services (such as AWS Route53 to get the DNS, AWS EC2 to get the instance IPs, AWS RDS to get the database IPs, etc.) and maybe a static list of IP addresses if you have assets in a Datacenter.
-3. Call NERVE API (`POST /api/scan/submit`) and schedule a scan using the assets you gathered in step #2.
+3. Call NERV&SPLOIT API (`POST /api/scan/submit`) and schedule a scan using the assets you gathered in step #2.
 4. Fetch the results programmatically and act on them (SOAR, JIRA, SIEM, etc.)
 5. Add your own logic (exclude certain alerts, add to database, etc.)
 
@@ -185,19 +187,19 @@ In your browser, navigate to http://ip.add.re.ss:8080 and login with the credent
 ### Run Installer (requires root)
 `bash install/setup.sh`
 
-### Check NERVE is running
+### Check NERV&SPLOIT is running
 `systemctl status nerve`
 
 In your browser, navigate to http://ip.add.re.ss:8080 and use the credentials printed in your terminal.
 
 
 # Multi Node Installation
-If you want to install NERVE in a multi-node deployment, you can follow the normal bare metal installation process, afterwards:
+If you want to install NERV&SPLOIT in a multi-node deployment, you can follow the normal bare metal installation process, afterwards:
 1. Modify the config.py file on each node
-2. Change the server address of Redis `RDS_HOST` to point to a central Redis server that all NERVE instances will report to.
+2. Change the server address of Redis `RDS_HOST` to point to a central Redis server that all NERV&SPLOIT instances will report to.
 3. Run `service nerve restart` or `systemctl restart nerve` to reload the configuration
 4. Run `apt-get remove redis` / `yum remove redis` (Depending on the Linux Distribution) since you will no longer need each instance to report to itself.
-Don't forget to allow port 3769 inbound on the Redis instance, so that the NERVE instances can communicate with it.
+Don't forget to allow port 3769 inbound on the Redis instance, so that the NERV&SPLOIT instances can communicate with it.
 
 # Upgrade
 If you want to upgrade your platform, the fastest way is to simply git clone and overwrite all the files while keeping key files such as configurations.
@@ -207,10 +209,10 @@ If you want to upgrade your platform, the fastest way is to simply git clone and
 * Move `config.py` file back into `/opt/nerve`
 * Restart the service using `systemctl restart nerve`.
 
-You could set up a cron task to auto-upgrade NERVE. There's an API endpoint to check whether you have the latest version or not that you could use for this purpose: `GET /api/update/platform`
+You could set up a cron task to auto-upgrade NERV&SPLOIT. There's an API endpoint to check whether you have the latest version or not that you could use for this purpose: `GET /api/update/platform`
 
 # Security
-There are a few security mechanisms implemented into NERVE you need to be aware of.
+There are a few security mechanisms implemented into NERV&SPLOIT you need to be aware of.
 
 * Content Security Policy - A response header which controls where resource scan be loaded from.
 * Other Security Policies - These Response headers are enabled: Content-Type Options, X-XSS-Protection, X-Frame-Options, Referer-Policy
@@ -226,7 +228,7 @@ We recommend to take the following steps before and after installation
 4. Keep the instance patched
 
 # Usage
-To learn about NERVE (GUI, API, etc.) we advise you to check out the documentation available to you via the platform.
+To learn about NERV&SPLOIT (GUI, API, etc.) we advise you to check out the documentation available to you via the platform.
 Once you deploy it, authenticate and on the left sidebar you will find a documentation link for API and GUI usage.
 
 ## GUI Documentation

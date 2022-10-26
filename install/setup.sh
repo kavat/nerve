@@ -9,7 +9,6 @@ if [ "$EUID" -ne 0 ]; then
 fi
 
 mkdir /opt/nerve
-mkdir /opt/profiles-inspec
 
 if [ "$cwd" != "/opt/nerve" ]; then
   echo "please run this script from within /opt/nerve folder."
@@ -24,11 +23,14 @@ fi
 supported=no
 if [ -f "/etc/redhat-release" ]; then
   os="redhat"
+  supported=no
+elif [ -f "/etc/lsb-release" ]; then
+  os="ubuntu"
   supported=yes
 fi
 
 if [ "$supported" == "no" ]; then 
-  echo "Can only run on CentOS 7.x"
+  echo "Can only run on Ubuntu 22.04 LTS"
   exit 1
 fi
 
@@ -37,35 +39,51 @@ if ! ping -c 1 -W 3 google.com &> /dev/null; then
   exit 1
 fi
 
+function install_ubuntu {
 
-function install_redhat {
-  yum install epel-release -y && \
-  yum update -y && \
-  yum install -y gcc && \
-  yum install -y redis && \
-  yum install -y python3 && \
-  yum install -y python3-pip && \
-  yum install -y python3-devel && \
-  yum install -y wget && \
-  yum install -y bzip2 && \
-  yum install -y make && \
-  yum install -y gcc-c++ && \
-  yum install -y postgresql-devel && \
-  yum install -y libffi-devel && \
-  yum install -y openssl-devel && \
-  yum install -y libjpeg-turbo-devel && \
-  yum install -y curl && \
-  yum install -y unzip && \
-  yum install -y jq && \
-  yum install -y openssh-clients && \
-  yum install -y net-tools && \
-  yum install -y iproute && \
-  yum install -y git && \
-  yum clean all && \
+  export DEBIAN_FRONTEND=noninteractive
+  export TARGET_FOLDER=/opt/nerve
+
+  apt update && \
+  apt install -y gcc && \
+  apt install -y redis && \
+  apt install -y python3 && \
+  apt install -y python3-pip && \
+  apt install -y python3-dev && \
+  apt install -y wget && \
+  apt install -y bzip2 && \
+  apt install -y make && \
+  apt install -y vim && \
+  apt install -y g++ && \
+  apt install -y at && \
+  apt install -y sudo && \
+  apt install -y postgresql-contrib && \
+  apt install -y libffi-dev && \
+  apt install -y libssl-dev && \
+  apt install -y build-essential && \ 
+  apt install -y libjpeg-turbo8-dev && \
+  apt install -y curl && \
+  apt install -y unzip && \
+  apt install -y jq && \
+  apt install -y openssh-server && \
+  apt install -y net-tools && \
+  apt install -y iproute2 && \
+  apt install -y git && \
+  apt install -y libpq-dev && \
+  apt install -y libkrb5-dev && \
+  apt install -y gss-ntlmssp
+
   wget https://nmap.org/dist/nmap-7.92.tar.bz2 && \
-  bzip2 -cd nmap-7.92.tar.bz2 | tar xvf - && \
-  cd nmap-7.92 && ./configure && make && make install && \
-  curl https://omnitruck.chef.io/install.sh | bash -s -- -P inspec
+    bzip2 -cd nmap-7.92.tar.bz2 | tar xvf - && \
+    cd nmap-7.92 && ./configure && make && make install
+
+  useradd -m metasploit && \
+    curl https://raw.githubusercontent.com/rapid7/metasploit-omnibus/master/config/templates/metasploit-framework-wrappers/msfupdate.erb | bash
+
+  echo "no" | sudo -u metasploit "msfdb init"
+
+  cd $TARGET_FOLDER/
+
 }
 
 function configure_firewalld {
@@ -125,13 +143,18 @@ WantedBy=multi-user.target
 fi
 
 if [ "$os" == "redhat" ]; then
-  echo "Installing packages..."
+  echo "Installing Centos packages..."
   install_redhat
-  echo "Starting Redis..."
-  systemctl enable redis
-  systemctl start redis
+elif [ "$os" == "ubuntu" ]; then
+  echo "Installing Centos packages..."
+  install_ubuntu
 fi
 
+echo "Starting Redis..."
+systemctl enable redis
+systemctl start redis
+
+echo "Installing Python requirements"
 pip3 install -r requirements.txt
 
 echo "Generating password"
