@@ -67,6 +67,7 @@ Using inspec framework and profiles official released by DevSec as:
 * [Linux Baseline](https://github.com/dev-sec/linux-baseline)
 * [CIS Linux](https://github.com/dev-sec/cis-dil-benchmark)
 * [Windows Baseline](https://github.com/dev-sec/windows-baseline)
+
 new project [compliance-profile](https://github.com/kavat/compliance-profile) on my repository was born. This feature allows to perform a scan to verify OS hardening suggested by DevSec profiles.
 
 Metasploit can do all sorts of things and in this integration a web console linked to msfconsole has been realized.
