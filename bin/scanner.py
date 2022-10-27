@@ -9,7 +9,7 @@ from core.command_sender import CommandSender
 from core.attacker       import attacker
 from core.utils          import log_exception
 
-def scanner():
+def network_scanner():
 
   try:
 

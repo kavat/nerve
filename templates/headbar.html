@@ -34,10 +34,18 @@
 </li>
 <li class="nav-item dropdown">
   <div class="nav-dropdown">
-  {% if status == "Ready" %}
-    <span class="nav-item nav-link"> <span class="navbar-status c-green"><i class="fas fa-smile"></i> Network Scan </span> </span>
-  {% else %}
-    <span class="nav-item nav-link"> <span class="navbar-status c-white"> <i class="fa fa-spinner fa-spin"></i> Network Scan </span> </span>
+  {% if status != "Ready" %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-white"> <i class="fa fa-spinner fa-spin"></i> Scan </span> </span>
+  {% endif %}
+  </div>
+</li>
+<li class="nav-item dropdown">
+  <div class="nav-dropdown">
+  {% if network_thread_status == 'green' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-green"><i class="fas fa-smile"></i> Network </span> </span>
+  {% endif %}
+  {% if network_thread_status == 'red' %}
+    <span class="nav-item nav-link"> <span class="navbar-status c-red"> <i class="fa fa-angry"></i> Network </span> </span>
   {% endif %}
   </div>
 </li>

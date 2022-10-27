@@ -137,6 +137,10 @@ def show_alarm_count():
   return dict(alarm_count=contatore)
 
 @app.context_processor
+def show_network_service_status():
+  return dict(network_thread_status=check_thread("network_scanner"))  
+
+@app.context_processor
 def show_cve_service_status():
   return dict(cve_service_status=check_service_http(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), 'api/get_cves/openssh:8.2', {"yellow": "ritorno['results'] == []", "green": "len(ritorno['results']) > 0"}))
 
