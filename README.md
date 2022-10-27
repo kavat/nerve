@@ -16,10 +16,8 @@
   * [Installation - Multi Node](#Multi-Node-Installation)
   * [Upgrade](#upgrade)
 * [Security](#security)
-* [Usage](#usage)
 * [License](#license)
 * [Screenshots](#screenshots)
-
 
 # Continuous Security
 As [Paytm](https://github.com/paytm/nerve) said when initial branch of NERVE has been released, security scanning should be done continuously. Not daily, weekly, monthly, or quarterly.
