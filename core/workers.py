@@ -1,6 +1,6 @@
 import threading
 
-from bin.scanner     import scanner
+from bin.scanner     import network_scanner
 from bin.attacker    import attacker
 from bin.scheduler   import scheduler
 from bin.cve_scanner import cve_scanner
@@ -9,8 +9,8 @@ from bin.metasploit  import metasploit
 
 
 def start_workers():
-  thread = threading.Thread(target=scanner)
-  thread.name = "scanner"
+  thread = threading.Thread(target=network_scanner)
+  thread.name = "network_scanner"
   thread.daemon = True
   thread.start()
 

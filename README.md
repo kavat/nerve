@@ -61,12 +61,13 @@ Network scan is based on NMAP library and checks and tests open doors and analys
 
 To come inside host, Flask interface creates a SSH VPN tunnel between itself and destination host (automatically or manually as indicated by UI interface).
 
-CVE search has been implemented and joined with NERV&SPLOUIT starting from the packages installed list. CVE-Search has been forked [on my repo](https://github.com/kavat/cve-search) and this version allows to perform API call with program name and version as only parameters. This provides a full list of CVE related to the packages installed on the system.
+CVE search has been implemented and joined with NERV&SPLOIT starting from the packages installed list. CVE-Search has been forked [on my repo](https://github.com/kavat/cve-search) and this version allows to perform API call with program name and version as only parameters. This provides a full list of CVE related to the packages installed on the system.
 
 Using inspec framework and profiles official released by DevSec as:
 * [Linux Baseline](https://github.com/dev-sec/linux-baseline)
 * [CIS Linux](https://github.com/dev-sec/cis-dil-benchmark)
 * [Windows Baseline](https://github.com/dev-sec/windows-baseline)
+
 new project [compliance-profile](https://github.com/kavat/compliance-profile) on my repository was born. This feature allows to perform a scan to verify OS hardening suggested by DevSec profiles.
 
 Metasploit can do all sorts of things and in this integration a web console linked to msfconsole has been realized.
@@ -192,7 +193,6 @@ In your browser, navigate to http://ip.add.re.ss:8080 and login with the credent
 
 In your browser, navigate to http://ip.add.re.ss:8080 and use the credentials printed in your terminal.
 
-
 # Multi Node Installation
 If you want to install NERV&SPLOIT in a multi-node deployment, you can follow the normal bare metal installation process, afterwards:
 1. Modify the config.py file on each node
@@ -227,18 +227,8 @@ We recommend to take the following steps before and after installation
 3. Add HTTPS (you can either patch Flask directly, or use a reverse proxy like nginx)
 4. Keep the instance patched
 
-# Usage
-To learn about NERV&SPLOIT (GUI, API, etc.) we advise you to check out the documentation available to you via the platform.
-Once you deploy it, authenticate and on the left sidebar you will find a documentation link for API and GUI usage.
-
-## GUI Documentation
-![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/10.png?raw=true)
-
-## API Documentation
-![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/11.png?raw=true)
-
 # License
-It is distributed under the MIT License. See LICENSE for more information.
+From orginal NERVE project, NERV&SPLOIT is distributed under the MIT License. See LICENSE for more information.
 
 # Screenshots
 ## Login Screen
@@ -247,8 +237,6 @@ It is distributed under the MIT License. See LICENSE for more information.
 ![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/dashboard.png)
 ## Assessment Configuration
 ![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/3.png?raw=true)
-## API Documentation
-![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/4.png?raw=true)
 ## Reporting
 ![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/reporting.png)
 ## Network Map
@@ -261,5 +249,5 @@ It is distributed under the MIT License. See LICENSE for more information.
 ![Nerve](https://raw.githubusercontent.com/kavat/nerve/master/screenshots/vulnerabilities_inspec.png)
 ## Log Console
 ![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/8.png?raw=true)
-## HTML Report
-![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/9.png?raw=true)
+## Metasploit Console
+![Nerve](https://github.com/kavat/nerve/blob/master/static/screenshots/13.png?raw=true)

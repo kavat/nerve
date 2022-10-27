@@ -5,7 +5,10 @@ import pexpect
 import time
 import os
 
-from core.utils   import Utils
+from core.utils   import (
+Utils,
+escape_ansi
+)
 from core.triage  import Triage
 from core.logging import logger
 from db import db_ports
@@ -100,12 +103,13 @@ class CommandSender():
     logger.info("SSH tunnel command: " + ssh_cmd)
     child = pexpect.spawn(ssh_cmd, timeout=3600)
     logger.info("Waiting for password prompt..")
-    child.expect(['[pP]assword: '])
+    child.expect('assword: ')
     logger.info("Insert password..")
     child.sendline(self.password)
     time.sleep(3)
+    logger.info("return_ssh_tunnel_command: {}".format(escape_ansi(child.before.decode('utf-8'))))
 
-    check_ssh_tunnel = os.popen("ps xa | grep ssh | grep w | grep -v grep | grep " + self.host).read()
+    check_ssh_tunnel = os.popen("ps xa | grep ssh | grep -v grep | grep " + self.host).read()
     logger.info("Tunnel: " + str(check_ssh_tunnel))
 
     if check_ssh_tunnel == '':
