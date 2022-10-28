@@ -6,15 +6,12 @@
 * [About NERV&SPLOIT](#)
   * [What is NERV&SPLOIT](#about-Nerv&Sploit)
   * [How it works](#how-it-works)
+  * [Limitations and roadmap](#limitations)
   * [Features](#features)
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [Configuration file config.py](#Configuration-file-config.py)
-  * [Deployment Recommendations](#Deployment-Recommendation)
-  * [Installation - Docker](#docker)
-  * [Installation - Bare Metal](#server)
-  * [Installation - Multi Node](#Multi-Node-Installation)
-  * [Upgrade](#upgrade)
+  * [Docker installation](#Docker installation)
 * [Security](#security)
 * [License](#license)
 * [Screenshots](#screenshots)
@@ -118,22 +115,6 @@ NERV&SPLOIT offers the following features:
 * Compliance profile execution with OS hardening best practice
 * Integration with Metasploit with dedicated section in order to run msfconsole
 
-# Prerequisites
-NERV&SPLOIT will install all the prerequisites for you automatically if you choose the Server installation (CentOS 8.x and Ubuntu 22.04 LTS were tested) (by using `install/setup.sh` script). It also comes with a Dockerfile for your convenience.
-
-Keep in mind, NERV&SPLOIT requires root access for the initial setup on bare metal (package installation, etc).
-
-Services and Packages required for NERV&SPLOIT to run:
-* Web Server (Flask)
-* Redis server (binds locally)
-* Nmap package (binary and Python nmap library)
-* Metasploit package
-* Inbound access on HTTP/S port (you can define this in config.py)
-
-The installation script takes care of everything for you, but if you want to install it by yourself, keep in mind these are required.
-
-For this version is strongly recommended Docker container installation.
-
 # Installation
 
 ## Configuration file config.py
@@ -148,66 +129,19 @@ PROFILE_SERVICE_PORT = 5000
 
 The first two lines indicate configuration for cve-search service, second two lines indicate configuration for compliance-profile service: both services has to be reachable from NERV&SPLOIT running host
 
-## Deployment Recommendation
-The best way to deploy it, is to run it against your infrastructure from multiple regions (e.g. multiple instances of NERV&SPLOIT, in multiple countries), and toggle continuous mode so that you can catch short-lived vulnerabilities in dynamic environments/cloud.
+## Docker installation
+Docker installation is recommended in order to get full and best interraction among services.
 
-We typically recommend not to whitelist the IP addresses where NERV&SPLOIT will be initiating the scans from, to truly test your infrastructure from an attacker standpoint.
-
-To make NERV&SPLOIT fairly lightweight, there's no use of a database other than Redis.
-
-If you want to store your vulnerabilities long term, we recommend using the Web hook feature. At the end of each scan cycle, NERV&SPLOIT will dispatch a JSON payload to an endpoint of your choice, and you can then store it in a database for further analysis.
-
-Here are the high level steps we recommend to get the most optimal results:
-1. Deploy NERV&SPLOIT on 1 or more servers.
-2. Create a script that fetches your Cloud services (such as AWS Route53 to get the DNS, AWS EC2 to get the instance IPs, AWS RDS to get the database IPs, etc.) and maybe a static list of IP addresses if you have assets in a Datacenter.
-3. Call NERV&SPLOIT API (`POST /api/scan/submit`) and schedule a scan using the assets you gathered in step #2.
-4. Fetch the results programmatically and act on them (SOAR, JIRA, SIEM, etc.)
-5. Add your own logic (exclude certain alerts, add to database, etc.)
-
-## Docker
 ### Clone the repository
 `git clone git@github.com:kavat/nerve.git && cd nerve`
 
 ### Build the Docker image
-`docker build -t nerve .`
+`docker build -t nerve -f DOCKER_FILE .`
 
 ### Create a container from the image
 `docker run -e username="YOUR_USER" -e password="YOUR_PASSWORD" -d --privileged -p 8080:8080 nerve`
 
 In your browser, navigate to http://ip.add.re.ss:8080 and login with the credentials you specified to in the previous command.
-
-# Server
-### Navigate to /opt
-`cd /opt/`
-
-### Clone the repository
-`git clone git@github.com:kavat/nerve.git && cd nerve`
-
-### Run Installer (requires root)
-`bash install/setup.sh`
-
-### Check NERV&SPLOIT is running
-`systemctl status nerve`
-
-In your browser, navigate to http://ip.add.re.ss:8080 and use the credentials printed in your terminal.
-
-# Multi Node Installation
-If you want to install NERV&SPLOIT in a multi-node deployment, you can follow the normal bare metal installation process, afterwards:
-1. Modify the config.py file on each node
-2. Change the server address of Redis `RDS_HOST` to point to a central Redis server that all NERV&SPLOIT instances will report to.
-3. Run `service nerve restart` or `systemctl restart nerve` to reload the configuration
-4. Run `apt-get remove redis` / `yum remove redis` (Depending on the Linux Distribution) since you will no longer need each instance to report to itself.
-Don't forget to allow port 3769 inbound on the Redis instance, so that the NERV&SPLOIT instances can communicate with it.
-
-# Upgrade
-If you want to upgrade your platform, the fastest way is to simply git clone and overwrite all the files while keeping key files such as configurations.
-
-* Make a copy of `config.py` if you wish to save your configurations
-* Remove `/opt/nerve` and git clone it again.
-* Move `config.py` file back into `/opt/nerve`
-* Restart the service using `systemctl restart nerve`.
-
-You could set up a cron task to auto-upgrade NERV&SPLOIT. There's an API endpoint to check whether you have the latest version or not that you could use for this purpose: `GET /api/update/platform`
 
 # Security
 There are a few security mechanisms implemented into NERV&SPLOIT you need to be aware of.
