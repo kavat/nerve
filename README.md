@@ -11,7 +11,7 @@
 * [Prerequisites](#prerequisites)
 * [Installation](#installation)
   * [Configuration file config.py](#Configuration-file-config.py)
-  * [Docker installation](#Docker installation)
+  * [Docker installation](#Docker)
 * [Security](#security)
 * [License](#license)
 * [Screenshots](#screenshots)
@@ -129,7 +129,7 @@ PROFILE_SERVICE_PORT = 5000
 
 The first two lines indicate configuration for cve-search service, second two lines indicate configuration for compliance-profile service: both services has to be reachable from NERV&SPLOIT running host
 
-## Docker installation
+## Docker
 Docker installation is recommended in order to get full and best interraction among services.
 
 ### Clone the repository
