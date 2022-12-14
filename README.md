@@ -44,7 +44,7 @@ Example of some of NERV&SPLOIT's detection capabilities:
 * Open Caches
 * Directory Indexing
 * Best Practices
-* NMAP execution without or with SSH VPN tunnel (this permits internal scan in order to detect services binded on localhost, it's important to indentify services if an attacker would want stealth persistency), named external or internal network scan
+* NMAP execution without or with SSH VPN tunnel/WinRM protocol (this permits internal scan in order to detect services binded on localhost, it's important to indentify services if an attacker would want stealth persistency), named external or internal network scan
 * CVE list based on packages installed list on the system (using cve-search framework forked [on my repo](https://github.com/kavat/cve-search))  
 * Profile scan using DevSec framework to verify OS hardening (using my [compliance-profile](https://github.com/kavat/compliance-profile) project)
 * Interface with Metasploit console (msfconsole)
@@ -54,7 +54,7 @@ NERV&SPLOIT permits to conduce vulnerability assessment based on NMAP run, launc
 
 Network scan is based on NMAP library and checks and tests open doors and analysis services related: normal scan (external) does it from outside, internal scan does it from inside and it's very important when we want to check internal perimeter in order to detect all points where an attacker could do stealth persistency.
 
-To come inside host, Flask interface creates a SSH VPN tunnel between itself and destination host (automatically or manually as indicated by UI interface).
+To come inside host, Flask interface creates a SSH VPN tunnel between itself and destination host (automatically or manually as indicated by UI interface); Windows side, WinRM configuration has to be checked in order to permit commands execution by over this protocol.
 
 CVE search has been implemented and joined with NERV&SPLOIT starting from the packages installed list. CVE-Search has been forked [on my repo](https://github.com/kavat/cve-search) and this version allows to perform API call with program name and version as only parameters. This provides a full list of CVE related to the packages installed on the system.
 
@@ -87,9 +87,22 @@ iptables -t nat -I PREROUTING -i tun0 -j DNAT --to 127.0.0.1
 
 After, interface will launches SSH VPN tunnel by itself (on destination host specified with SSH username and password) and it will starts assessment operations
 
+## Manually WinRM configuration
+Manual creation has as requirement that preliminary operations on destination host has to be done by user.
+
+User has to login to destination host and run the following command
+
+```
+winrm set winrm/config/service/auth '@{Basic="true"}'
+winrm set winrm/config/client '@{AllowUnencrypted="true"}'
+winrm set winrm/config/service '@{AllowUnencrypted="true"}'
+```
+
+After, interface will launches WinRM operation by itself (on destination host specified with WinRM username and password) and it will starts assessment operations
+
 # Limitations
 
-Internal scan, CVE search and Compliance profile in this moment don't support Windows (in roadmap windows compatibility)
+CVE search and Compliance profile in this moment don't support Windows (in roadmap windows compatibility)
 
 Internal scan, CVE search and Compliance profile in this moment support one host for time scan (in roadmap CIDR extension)
 

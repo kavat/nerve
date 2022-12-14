@@ -22,13 +22,13 @@ def run_rules(conf):
     rules = rule_manager(role='attacker')
     if 'ports' in values and len(values['ports']) > 0:  
       for port in values['ports']:
-        logger.info('Attacking Asset: {} on port: {}'.format(ip, port))
+        logger.info('ATTACKER THREAD - Attacking Asset: {} on port: {}'.format(ip, port))
         for rule in rules.values():
           """
             Check if the target is in exclusions list, if it is, skip.
           """
           if rule.rule in exclusions and ip in exclusions[rule.rule]:
-            logger.debug('Skipping rule {} for target {}'.format(rule.rule, ip))
+            logger.debug('ATTACKER THREAD - Skipping rule {} for target {}'.format(rule.rule, ip))
             continue
 
           """
@@ -40,14 +40,14 @@ def run_rules(conf):
   return threads
 
 def attacker(conf):
-  logger.info('Attacker process started')
+  logger.info('ATTACKER THREAD - Attacker process started')
 
-  logger.info("Attacker threads creation..") 
+  logger.info("ATTACKER THREAD - Attacker threads creation..") 
   threads = run_rules(conf)
 
   for i in range(len(threads)):
     try:  
-      logger.info("Launching thread n " + str(i))
+      logger.info("ATTACKER THREAD - Launching thread n " + str(i))
       threads[i].start()
     except Exception as e:
       log_exception("ATTACKER THREAD - Exception on thread start: {}".format(str(e)))
@@ -55,10 +55,10 @@ def attacker(conf):
 
   for t in threads:
     try:
-      logger.info("Wait for thread end..")
+      logger.info("ATTACKER THREAD - Wait for thread end..")
       t.join()
     except Exception as e:
       log_exception("ATTACKER THREAD - Exception on thread join: {}".format(str(e)))
       rds.save_error("ATTACKER THREAD", "attacker", "Exception on thread join: {}".format(str(e)), str(traceback.format_exc()))
 
-  logger.info("Attacker threads terminated")
+  logger.info("ATTACKER THREAD - Attacker threads terminated")

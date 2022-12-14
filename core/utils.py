@@ -208,28 +208,23 @@ def check_thread(thread_name):
 
 def check_service_http(host, port, path, matrix_keys_values):
   url = "http://{}:{}/{}".format(host, port, path)
-  logger.info("Launching GET request to {}".format(url))
+  logger.debug("Launching GET request to {}".format(url))
   return_color = 'red' 
   try:
     r = requests.get(url)
-    logger.info("Call ended with status {}".format(r.status_code))
+    logger.debug("Call ended with status {}".format(r.status_code))
     if r.status_code == 200:
       ritorno = r.json()
-
-      logger.info("{}:{} - ritorno: {}".format(host, str(port), ritorno))
-
+      logger.debug("{}:{} - ritorno: {}".format(host, str(port), ritorno))
       try:
-
         if 'yellow' in matrix_keys_values:
-          logger.info("{}:{} - Yellow found: {}, return {}".format(host, str(port), matrix_keys_values['yellow'], str(eval(matrix_keys_values['yellow']))))
+          logger.debug("{}:{} - Yellow found: {}, return {}".format(host, str(port), matrix_keys_values['yellow'], str(eval(matrix_keys_values['yellow']))))
           if eval(matrix_keys_values['yellow']):
             return_color = 'yellow'
-
         if 'green' in matrix_keys_values:
-          logger.info("{}:{} - Green found: {}, return {}".format(host, str(port), matrix_keys_values['green'], str(eval(matrix_keys_values['green']))))
+          logger.debug("{}:{} - Green found: {}, return {}".format(host, str(port), matrix_keys_values['green'], str(eval(matrix_keys_values['green']))))
           if eval(matrix_keys_values['green']):
             return_color = 'green'
-
       except Exception as e:
         log_exception("Exception: ".format(str(e)))
     else:

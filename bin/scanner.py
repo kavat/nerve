@@ -35,6 +35,15 @@ def network_scanner():
         time.sleep(10)
         continue
 
+      if c.get_type_ie_config() == "internal":
+        username_access = c.get_username_ssh_config()
+        password_access = c.get_password_ssh_config()
+        os = c.get_cfg_os()
+      else:
+        os = ""
+        username_access = ""
+        password_access = ""
+
       logger.debug("NETWORK_SCANNER - Scan configuration: " + str(conf))
       hosts = rds.get_ips_to_scan(limit = c.get_cfg_scan_threads())
       logger.info("NETWORK_SCANNER - Hosts to scan: " + str(hosts))
@@ -44,9 +53,14 @@ def network_scanner():
         scan_data = scanner.scan(hosts,
                             max_ports = c.get_cfg_max_ports(),
                             custom_ports = c.get_cfg_custom_ports(),
-                            interface = c.get_cfg_netinterface())
+                            interface = c.get_cfg_netinterface(),
+                            os = os,
+                            scan_type = c.get_type_ie_config(),
+                            username = username_access,
+                            password = password_access)
 
         if scan_data:
+          logger.info("NETWORK_SCANNER - scan_data: {}".format(scan_data.items()))
           for host, values in scan_data.items():
             logger.info('NETWORK_SCANNER - Discovered Asset: {}'.format(host))
             try:

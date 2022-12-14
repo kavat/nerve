@@ -281,6 +281,9 @@ class ConfParser:
   def get_cfg_scan_config(self):
     return self.values['config']
 
+  def get_cfg_os(self):
+    return self.values['host_os']
+
   def get_type_ie_config(self):
     return self.values['type_ie']
 

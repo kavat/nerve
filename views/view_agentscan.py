@@ -25,21 +25,25 @@ def view_agentscan():
   if request.method == 'POST':
     register = Register()
     ip = request.values.get('ip')
+    os = request.values.get('os')
     username_ssh = request.values.get('username_ssh')
     password_ssh = request.values.get('password_ssh')
     how = request.values.get('how')
     scan = copy.deepcopy(config.DEFAULT_SCAN)
 
-    if ip and username_ssh and password_ssh:
-      logger.info("Sending preliminar SSH commands..")
+    if ip and username_ssh and password_ssh and os:
       real_ip = ''
       try:
-        command_sender = CommandSender(ip, username_ssh, password_ssh, how, "")
-        command_sender.create_tunnel()
-        real_ip = ip
-        ip = scan['ip_peer_static']
+        if os == "linux":
+          logger.info("Sending preliminar SSH commands..")
+          command_sender = CommandSender(ip, username_ssh, password_ssh, how, "")
+          command_sender.create_tunnel()
+          real_ip = ip
+          ip = scan['ip_peer_static']
+        else:
+          real_ip = ip
       except Exception as e:
-        errore = 'Failed to execute preliminar SSH commands: '+ str(e)
+        errore = 'Failed to execute preliminar commands: '+ str(e)
         logger.error(errore)
         logger.exception(e)
         flash(errore, 'error')
@@ -47,6 +51,7 @@ def view_agentscan():
         scan['type'] = 'network'
         scan['type_ie'] = 'internal'
         scan['how'] = how
+        scan['host_os'] = os
         scan['real_ip'] = real_ip
         scan['username_ssh'] = username_ssh
         scan['password_ssh'] = password_ssh

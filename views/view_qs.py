@@ -30,6 +30,7 @@ def view_qs():
     if network:
       scan = copy.deepcopy(config.DEFAULT_SCAN)
       scan['type'] = 'network'
+      scan['config']['scan_opts']['max_ports'] = -1
       scan['targets']['networks'].append(network)
       schema = SchemaParser(scan, request)
       vfd, msg, scan = schema.verify()

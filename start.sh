@@ -20,7 +20,7 @@ echo "/opt/nerve/update_metasploit.sh" | at now + 15 minutes
 
 echo "Start NERVE.."
 export LANG="en_US.UTF-8"
-/usr/bin/python3 main.py
+echo "FLUSHALL" | redis-cli && /usr/bin/python3 main.py
 tail -f /dev/null
 
 echo "Exited.."
