@@ -83,7 +83,8 @@ def get_cves_by_cpes(thread_id, cpes, host):
           if type_vuln == "internal_executable":
             type_vuln_desc = "Package with executable used by internal socket"
           cpe = cpe_full.split(";")[1]
-          url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
+          #url = "http://{}:{}/api/get_cves/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
+          url = "http://{}:{}/api/get_cves_mongo/{}".format(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), cpe)
           logger.info("Thread {} - Launching GET request to {}".format(str(thread_id), url))
           r = requests.get(url)
           logger.info("Thread {} - Call ended with status {}".format(str(thread_id), str(r.status_code)))
