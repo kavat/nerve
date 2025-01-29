@@ -142,7 +142,7 @@ def show_network_service_status():
 
 @app.context_processor
 def show_cve_service_status():
-  return dict(cve_service_status=check_service_http(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), 'api/get_cves/openssh:8.2', {"yellow": "ritorno['results'] == []", "green": "len(ritorno['results']) > 0"}))
+  return dict(cve_service_status=check_service_http(rds.get_custom_config('config_cve_scan_service_host'), str(rds.get_custom_config('config_cve_scan_service_port')), 'api/get_cves_mongo/openssh:8.2', {"yellow": "ritorno['results'] == []", "green": "len(ritorno['results']) > 0"}))
 
 @app.context_processor
 def show_profile_service_status():

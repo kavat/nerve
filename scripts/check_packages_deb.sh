@@ -1,6 +1,7 @@
 # RESET TEMP FILES
 > /tmp/appoggio
 > /tmp/ritorno
+> /tmp/dettagli
 
 for protocol in tcp udp; do
 
@@ -19,6 +20,12 @@ for protocol in tcp udp; do
     for libreria in $librerie; do
       for file_returned in $(dpkg -S $libreria | awk -F':' '{print $1}' | sort -u | awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
         echo "${type_vuln};used;${file_returned}" >> /tmp/appoggio
+        softwares=$(find /proc -lname "socket:\\[$INODE\\]" 2>/dev/null | head -n 1 | awk -F "/" '{print "cat /proc/"$3"/comm"}' | bash)
+        for software in $softwares; do
+          for sw_returned in $(find / -type f -executable -name $software 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
+            echo "${sw_returned};${ip_binding_for_inode};${type_vuln}" >> /tmp/dettagli
+          done
+        done
       done
     done
 
@@ -27,6 +34,12 @@ for protocol in tcp udp; do
       for libreria_linked in $(find / -type l -name $libreria 2>/dev/null | awk -F' ' '{print "ls -l "$1}' | bash | awk '{print $NF}'); do
         for file_returned in $(dpkg -S $libreria_linked | awk -F':' '{print $1}' | sort -u | awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
           echo "${type_vuln};used;${file_returned}" >> /tmp/appoggio
+          softwares=$(find /proc -lname "socket:\\[$INODE\\]" 2>/dev/null | head -n 1 | awk -F "/" '{print "cat /proc/"$3"/comm"}' | bash)
+          for software in $softwares; do
+            for sw_returned in $(find / -type f -executable -name $software 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
+              echo "${sw_returned};${ip_binding_for_inode};${type_vuln}" >> /tmp/dettagli
+            done
+          done
         done
       done
     done
@@ -36,6 +49,7 @@ for protocol in tcp udp; do
     for software in $softwares; do
       for file_returned in $(find / -type f -executable -name $software 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
         echo "${type_vuln};executable;${file_returned}" >> /tmp/appoggio
+        echo "${file_returned};${ip_binding_for_inode};${type_vuln}" >> /tmp/dettagli
       done
     done
 
@@ -44,6 +58,7 @@ for protocol in tcp udp; do
       for software_linked in $(find / -type l -name $software 2>/dev/null | awk -F' ' '{print "ls -l "$1}' | bash | awk '{print $NF}'); do
         for file_returned in $(find / -type f -executable -name $software_linked 2>/dev/null| awk -F' ' '{print "dpkg-query -S "$1}' | bash | awk -F':' '{print $1}' | sort -u| awk -F' ' '{print "dpkg-query -W "$1}' | bash | sed "s/[\t ]\+/___/g"); do
           echo "${type_vuln};executable;${file_returned}" >> /tmp/appoggio
+          echo "${file_returned};${ip_binding_for_inode};${type_vuln}" >> /tmp/dettagli
         done
       done
     done
